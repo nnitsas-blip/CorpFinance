@@ -1,0 +1,490 @@
+<title>Equity</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky tab bar over a single 1100px column; each tab is a workbench of panels (controls left, readout right) */
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#16202C; --muted:#5B6B82; --line:#D9E0E8;
+  --navy:#0E1A2B; --teal:#0E8A96; --amber:#C98A22; --red:#C2453B; --slate:#5B6B82; --tint:#E8F3F4;
+  --ok:#1E7F4F; --bad:#B23A30;
+  --f-display:"Newsreader", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C141F; --surface:#131E2C; --ink:#E6ECF2; --muted:#9AA9BC; --line:#26354A;
+  --navy:#E6ECF2; --teal:#4FC3CC; --amber:#E8B04F; --red:#EE7A6E; --slate:#9AA9BC; --tint:#14303A;
+  --ok:#5FD39A; --bad:#F08A80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C141F; --surface:#131E2C; --ink:#E6ECF2; --muted:#9AA9BC; --line:#26354A;
+  --navy:#E6ECF2; --teal:#4FC3CC; --amber:#E8B04F; --red:#EE7A6E; --slate:#9AA9BC; --tint:#14303A;
+  --ok:#5FD39A; --bad:#F08A80; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding-inline:16px;padding-block:20px 48px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+.kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+.sub{color:var(--muted);margin:4px 0 0;max-width:62ch}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin:0 -16px 20px;padding:8px 16px 0}
+nav.tabs button{font:inherit;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px 10px;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--teal)}
+nav.tabs button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.tabnum{font-family:var(--f-mono);font-size:12px;color:var(--teal);margin-right:6px}
+section.tab{display:grid;gap:18px}
+h2{font-family:var(--f-display);font-size:26px;font-weight:700;margin:0;text-wrap:balance}
+h3{font-size:16px;font-weight:600;margin:0 0 8px}
+.lede{color:var(--muted);margin:2px 0 0;max-width:70ch}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:820px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.panel.flat{background:var(--tint);border-color:transparent}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field{display:grid;gap:4px;margin-bottom:12px}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.row>.field{flex:1 1 120px}
+input[type=number],input[type=text],select,textarea{font:inherit;font-family:var(--f-mono);font-size:14px;width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+textarea{font-family:var(--f-body);resize:vertical;min-height:60px}
+input[type=range]{width:100%;accent-color:var(--teal)}
+.rangeval{font-family:var(--f-mono);font-size:14px;color:var(--ink)}
+button.btn{font:inherit;font-weight:500;padding:8px 14px;border-radius:6px;border:1px solid var(--teal);background:var(--teal);color:var(--surface);cursor:pointer}
+button.btn.ghost{background:transparent;color:var(--teal)}
+button.btn.small{padding:4px 10px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:var(--surface)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--tint);border-radius:8px;padding:10px 12px}
+.stat .v{font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.stat .k{font-size:12px;color:var(--muted)}
+.rating{display:inline-block;font-family:var(--f-mono);font-weight:500;padding:2px 8px;border-radius:4px;color:#fff}
+.rating.ig{background:#1E7F4F}.rating.bbb{background:#B07A12}.rating.hy{background:#B23A30}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.tablewrap{overflow-x:auto}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--f-body);font-size:11px}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.note{font-size:13px;color:var(--muted)}
+.q{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.q:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.q p{margin:0 0 8px;font-weight:500}
+.opts{display:grid;gap:6px}
+.opt{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:6px;cursor:pointer;background:var(--surface)}
+.opt input{margin-top:4px}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--surface))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
+.fb{font-size:14px;margin-top:6px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.ans{display:grid;grid-template-columns:minmax(0,1fr) 120px auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.ans:last-child{border-bottom:0}
+.ans .mark{font-size:13px;min-width:70px}
+.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+.given{font-family:var(--f-mono);font-size:13px;background:var(--tint);border-radius:6px;padding:8px 10px;margin:6px 0 10px;line-height:1.7}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.role{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface)}
+.role h4{margin:0 0 6px;font-size:15px}
+.role p{margin:0 0 6px;font-size:13.5px}
+.role ul{margin:0;padding-left:18px;font-size:13.5px}
+.bar{height:26px;border-radius:4px;background:var(--teal);min-width:2px;transition:width .3s}
+.barrow{display:grid;grid-template-columns:150px minmax(0,1fr) 44px;gap:10px;align-items:center;margin-bottom:8px;font-size:14px}
+.barrow .n{font-family:var(--f-mono);text-align:right}
+.reasons{display:grid;gap:6px;max-height:260px;overflow:auto;margin-top:10px}
+.reasons div{font-size:13.5px;background:var(--tint);border-radius:6px;padding:6px 10px}
+.status{font-size:13px;color:var(--muted)}
+details summary{cursor:pointer;color:var(--teal);font-weight:500}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:520px){.ans{grid-template-columns:minmax(0,1fr) 100px}.ans .mark{grid-column:1/-1}.barrow{grid-template-columns:110px minmax(0,1fr) 36px}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="kicker">FIN7F2 Corporate Finance · Lecture 4 seminar</p>
+      <h1>Equity</h1>
+      <p class="sub">Six activities on the cost of equity, beta, AstraZeneca's WACC and levering. The last one works through Assignment 1, Parts II and III, for your own company.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Activities">
+    <button role="tab" id="t-quiz" aria-controls="quiz" aria-selected="true"><span class="tabnum">1</span>Quiz</button>
+    <button role="tab" id="t-capm" aria-controls="capm" aria-selected="false"><span class="tabnum">2</span>CAPM and beta</button>
+    <button role="tab" id="t-az" aria-controls="az" aria-selected="false"><span class="tabnum">3</span>AstraZeneca case</button>
+    <button role="tab" id="t-lev" aria-controls="lev" aria-selected="false"><span class="tabnum">4</span>Levering betas</button>
+    <button role="tab" id="t-prac" aria-controls="prac" aria-selected="false"><span class="tabnum">5</span>Practice</button>
+    <button role="tab" id="t-co" aria-controls="co" aria-selected="false"><span class="tabnum">6</span>Your company</button>
+  </nav>
+
+  <!-- 1 QUIZ -->
+  <section class="tab" id="quiz" role="tabpanel" aria-labelledby="t-quiz">
+    <div><h2>Quiz</h2><p class="lede">Eight questions on Lecture 4. Answers are checked as you choose.</p></div>
+    <div class="panel" id="quizbox"></div>
+    <div class="panel flat"><strong id="quizscore">Score: 0 / 8</strong> <span class="note">Your score stays on your device only.</span></div>
+  </section>
+
+  <!-- 2 CAPM -->
+  <section class="tab" id="capm" role="tabpanel" aria-labelledby="t-capm" hidden>
+    <div><h2>CAPM and beta</h2><p class="lede">The CAPM inputs (Lecture 4, slides 8 and 9), what beta and R² measure (slides 11 and 12), and why two data providers give different betas (slide 17).</p></div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>A. Security market line</h3>
+        <div class="field"><label for="cRf">Risk-free rate: <span class="rangeval" id="cRfv"></span></label><input type="range" id="cRf" min="0" max="8" step="0.01" value="5.24"></div>
+        <div class="field"><label for="cErp">Equity risk premium: <span class="rangeval" id="cErpv"></span></label><input type="range" id="cErp" min="2" max="8" step="0.01" value="4.20"></div>
+        <div class="field"><label for="cB">Raw beta: <span class="rangeval" id="cBv"></span></label><input type="range" id="cB" min="0" max="2.5" step="0.01" value="1.20"></div>
+        <div class="stats" id="cStats"></div>
+        <p class="note">Defaults: 10-year US Treasury 5.24% (9 October 2026) and Damodaran's implied ERP of 4.20% (1 October 2026), as in slides 10 and 17.</p>
+      </div>
+      <div class="panel">
+        <svg class="chart" id="smlChart" viewBox="0 0 560 300" role="img" aria-label="Security market line"></svg>
+        <div class="legend"><span><i style="background:var(--teal)"></i>Security market line</span><span><i style="background:var(--amber)"></i>Your stock</span></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>B. How much of the risk is systematic?</h3>
+        <div class="row">
+          <div class="field"><label for="rB">Beta</label><input type="number" id="rB" value="1.2" step="0.05"></div>
+          <div class="field"><label for="rSi">Stock volatility (%)</label><input type="number" id="rSi" value="30" step="1"></div>
+          <div class="field"><label for="rSm">Market volatility (%)</label><input type="number" id="rSm" value="15" step="1"></div>
+        </div>
+        <div class="stats" id="rStats"></div>
+        <p class="note">R² = β²σ<sub>M</sub>² / σ<sub>i</sub>². The defaults reproduce the worked example on slide 12.</p>
+      </div>
+      <div class="panel">
+        <svg class="chart" id="rChart" viewBox="0 0 560 120" role="img" aria-label="Systematic and firm-specific risk"></svg>
+        <div class="legend"><span><i style="background:var(--teal)"></i>Systematic (R²)</span><span><i style="background:var(--slate)"></i>Firm-specific (1 − R²)</span></div>
+        <div class="panel flat" style="margin-top:12px">
+          <h3>Questions for pairs</h3>
+          <ol class="note" style="margin:0;padding-left:18px;color:var(--ink)">
+            <li>Set beta to 0.21, AstraZeneca's beta on Yahoo Finance. What cost of equity does the CAPM give, and why is it not credible next to a 5.81% cost of debt?</li>
+            <li>Set beta to 0.83, AstraZeneca's beta on Reuters (slide 17). How much does the cost of equity rise, and why might the two providers disagree?</li>
+            <li>A stock with a high R² and a stock with a low R² have the same beta. Which one matters more to a diversified investor?</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 AZ -->
+  <section class="tab" id="az" role="tabpanel" aria-labelledby="t-az" hidden>
+    <div><h2>AstraZeneca case</h2><p class="lede">From beta to WACC to economic profit (Lecture 4, slides 17, 18 and 21). All inputs are October 2026. The after-tax cost of debt, 4.36%, is the 5.81% yield on the 2036 notes after 25% tax (Lecture 4, slides 4 and 5; 3.49% in February, Lecture 3).</p></div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Choose the inputs</h3>
+        <div class="field"><label>Beta</label>
+          <div class="chips" id="azBeta">
+            <button class="chip" data-b="0.21" aria-pressed="false">Yahoo 0.21</button>
+            <button class="chip" data-b="0.83" aria-pressed="true">Reuters 0.83</button>
+            <button class="chip" data-b="0.9236" aria-pressed="false">Our FTSE 100 regression 0.92</button>
+          </div>
+        </div>
+        <div class="field"><label for="azB">Or set your own: <span class="rangeval" id="azBv"></span></label><input type="range" id="azB" min="0" max="1.6" step="any" value="0.83"></div>
+        <div class="field"><label for="azErp">Equity risk premium: <span class="rangeval" id="azErpv"></span></label><input type="range" id="azErp" min="3" max="6.5" step="0.01" value="4.20"></div>
+        <div class="stats" id="azStats"></div>
+        <p class="note">Fixed inputs: risk-free 5.24% (9 Oct 2026), pre-tax cost of debt 5.81% (2036 notes, October 2026), tax 25%, market cap $248.7bn, debt including leases $29.6bn, ROIC 16.5% on average invested capital of $68,767m (2025).</p>
+      </div>
+      <div class="panel">
+        <svg class="chart" id="azChart" viewBox="0 0 560 300" role="img" aria-label="WACC against beta"></svg>
+        <div class="legend"><span><i style="background:var(--teal)"></i>WACC</span><span><i style="background:var(--red)"></i>Cost of equity</span><span><i style="background:var(--amber)"></i>ROIC 16.5%</span><span><i style="background:var(--slate)"></i>Bond yield + 3% to 5%</span><span><i style="background:var(--teal);opacity:.6"></i>Disclosed WACC 7.5%</span></div>
+        <div class="panel flat" style="margin-top:12px">
+          <h3>Questions for pairs</h3>
+          <ol class="note" style="margin:0;padding-left:18px;color:var(--ink)">
+            <li>How close does the Reuters beta come to the bond-yield-plus-premium band (slide 15)? What beta would put the cost of equity at the band's midpoint?</li>
+            <li>How high would beta have to be before AstraZeneca stops earning economic profit?</li>
+            <li>Change the ERP from 4.20% to 5.5%. How much does WACC move? Why does the cost of debt matter so little here?</li>
+            <li>AstraZeneca reports a WACC of 7.5% (slide 19). Which combination of inputs gets you closest to it?</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 LEVERING -->
+  <section class="tab" id="lev" role="tabpanel" aria-labelledby="t-lev" hidden>
+    <div><h2>Levering betas: the pure-play method</h2><p class="lede">Unlever each comparable's beta to remove its financial risk, average the asset betas, then relever at your company's capital structure (Lecture 4, slides 23 to 26).</p></div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Comparable companies</h3>
+        <div class="tablewrap"><table id="compTable"></table></div>
+        <div class="row" style="margin-top:10px">
+          <button class="btn ghost small" id="compAdd">Add a comparable</button>
+          <button class="btn ghost small" id="compSlide">Load the textbook example</button>
+          <button class="btn ghost small" id="compGsk">Load GSK and Haleon (slide 26)</button>
+        </div>
+        <div class="row" style="margin-top:12px">
+          <div class="field"><label for="lDE">Target D/E for your company</label><input type="number" id="lDE" value="0.25" step="0.05"></div>
+          <div class="field"><label for="lT">Your tax rate (%)</label><input type="number" id="lT" value="40" step="1"></div>
+        </div>
+        <div class="stats" id="lStats"></div>
+        <p class="note">β<sub>asset</sub> = β<sub>equity</sub> / [1 + (1 − t)(D/E)] and β<sub>equity</sub> = β<sub>asset</sub> × [1 + (1 − t)(D/E)], assuming a debt beta of zero (slide 25).</p>
+      </div>
+      <div class="panel">
+        <svg class="chart" id="levChart" viewBox="0 0 560 300" role="img" aria-label="Equity beta against D/E"></svg>
+        <div class="legend"><span><i style="background:var(--teal)"></i>Relevered equity beta</span><span><i style="background:var(--amber)"></i>Your target D/E</span></div>
+        <p class="note">Textbook example: Thatsit Company (beta 1.4, D/E 0.5, tax 40%) gives an asset beta of 1.0769 and a project beta of 1.2385 at D/E 0.25. GSK and Haleon: the household-products asset beta of 0.74 (Damodaran, January 2026) relevers to 0.88 at D/E 0.25 and 25% tax, as on slide 26.</p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel flat">
+        <h3>Questions for pairs</h3>
+        <ol class="note" style="margin:0;padding-left:18px;color:var(--ink)">
+          <li>Why do we unlever a comparable company's beta before using it? What would go wrong if we used its equity beta directly?</li>
+          <li>Load GSK and Haleon. How much higher is the cost of equity for a consumer-health project if you wrongly use a pharma beta?</li>
+          <li>Raise your target D/E from 0.25 to 0.75. Why does the equity beta rise even though the business is unchanged?</li>
+        </ol>
+      </div>
+      <div id="levPrac"></div>
+    </div>
+  </section>
+
+  <!-- 5 PRACTICE -->
+  <section class="tab" id="prac" role="tabpanel" aria-labelledby="t-prac" hidden>
+    <div><h2>Practice</h2><p class="lede">Six problems, one for each method in Lecture 4. Answers are checked to a small tolerance; the worked solution opens after two attempts.</p></div>
+    <div class="panel flat"><p class="note" style="margin:0">Enter percentages as numbers (9.05 for 9.05%).</p></div>
+    <div id="pracBody"></div>
+  </section>
+
+  <!-- 6 YOUR COMPANY -->
+  <section class="tab" id="co" role="tabpanel" aria-labelledby="t-co" hidden>
+    <div><h2>Your company: Assignment 1, Parts II and III</h2><p class="lede">Paste your company's returns and its market index returns to get volatility, beta, R² and Jensen's alpha; then build the cost of equity, WACC and ROIC. The page only does arithmetic; the interpretation and the write-up are yours.</p></div>
+    <div class="panel flat">
+      <h3>What the brief asks for</h3>
+      <div class="tablewrap"><table id="briefMap"></table></div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>1. Returns</h3>
+        <div class="field"><label for="yName">Company</label><input type="text" id="yName" placeholder="Company name"></div>
+        <div class="field"><label for="yData">Monthly returns in %, one month per line: stock, index (e.g. 2.4, 1.1)</label><textarea id="yData" style="min-height:160px;font-family:var(--f-mono);font-size:13px"></textarea></div>
+        <div class="row"><button class="btn ghost small" id="yAZ">Load AstraZeneca data (AZN.L vs FTSE 100)</button><button class="btn ghost small" id="yExample">Load example data (simulated)</button><button class="btn ghost small" id="yClear">Clear</button></div>
+        <p class="note">Use the same months for both series: monthly total returns for at least 36 months (60 is common), against the index your company is most exposed to (slide 11). The example data is simulated, not a real company. The AstraZeneca data are 60 monthly price returns, October 2021 to September 2026, of AZN.L against the iShares FTSE 100 ETF (Yahoo Finance); they should give a beta of 0.924, as on slide 17.</p>
+      </div>
+      <div class="panel">
+        <h3>Regression results</h3>
+        <div class="stats" id="yStats"></div>
+        <svg class="chart" id="yChart" viewBox="0 0 560 300" role="img" aria-label="Stock returns against index returns" style="margin-top:12px"></svg>
+        <p class="note">Each dot is one month. The slope of the line is beta.</p>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>2. Cost of equity and WACC</h3>
+        <div class="row">
+          <div class="field"><label for="yRf">Risk-free rate (%)</label><input type="number" id="yRf" value="5.24" step="0.01"></div>
+          <div class="field"><label for="yErp">Equity risk premium (%)</label><input type="number" id="yErp" value="4.20" step="0.01"></div>
+        </div>
+        
+        <div class="row">
+          <div class="field"><label for="yRd">Pre-tax cost of debt (%), from the Debt page</label><input type="number" id="yRd" step="0.01" placeholder="e.g. 5.81"></div>
+          <div class="field"><label for="yTax">Marginal tax rate (%)</label><input type="number" id="yTax" value="25" step="1"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="yE">Market value of equity</label><input type="number" id="yE" step="any" placeholder="market cap"></div>
+          <div class="field"><label for="yD">Debt including leases</label><input type="number" id="yD" step="any" placeholder="same units"></div>
+        </div>
+        <h3 style="margin-top:6px">3. ROIC (Part III)</h3>
+        <div class="row">
+          <div class="field"><label for="yEbit">EBIT</label><input type="number" id="yEbit" step="any"></div>
+          <div class="field"><label for="yEtr">Tax rate for NOPAT (%)</label><input type="number" id="yEtr" value="25" step="0.1"></div>
+          <div class="field"><label for="yIc">Average invested capital</label><input type="number" id="yIc" step="any" placeholder="equity + net debt"></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Results</h3>
+        <div class="tablewrap"><table id="yTable"></table></div>
+        <div class="field" style="margin-top:14px"><label for="yWhy">Interpretation: is your company earning economic profit? (two sentences)</label><textarea id="yWhy" placeholder="e.g. ROIC of 16.5% exceeds the 8.3% WACC, so..."></textarea></div>
+        <button class="btn" id="yCopy">Copy summary</button> <span class="status" id="yCopyStatus"></span>
+        <p class="note">Your inputs stay on this device. Copy the summary into your notes before you close the page.</p>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+// ===== helpers =====
+const $=s=>document.querySelector(s);
+const fmt=(x,d=2)=>Number.isFinite(x)?x.toLocaleString("en-GB",{minimumFractionDigits:d,maximumFractionDigits:d}):"n/a";
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function el(tag,attrs={},text){const e=document.createElement(tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!==undefined)e.textContent=text;return e;}
+function stats(box,items){box.replaceChildren(...items.map(([k,v])=>{const d=el("div",{class:"stat"});d.append(el("div",{class:"v"},v),el("div",{class:"k"},k));return d;}));}
+function table(tb,head,rows){tb.replaceChildren();const hr=el("tr");head.forEach(h=>hr.append(el("th",{},h)));tb.append(hr);rows.forEach(r=>{const tr=el("tr");r.forEach(c=>{const td=el("td");if(c instanceof Node)td.append(c);else td.textContent=c;tr.append(td);});tb.append(tr);});}
+const NS="http://www.w3.org/2000/svg";
+function svgEl(tag,attrs){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+function svgText(svg,x,y,t,anchor="middle",extra={}){const tx=svgEl("text",Object.assign({x,y,"text-anchor":anchor},extra));tx.textContent=t;svg.append(tx);return tx;}
+function niceStep(x){const p=Math.pow(10,Math.floor(Math.log10(x)));const n=x/p;return (n<1.5?1:n<3?2:n<7?5:10)*p;}
+function range(a,b,s){const out=[];for(let v=a;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));return out;}
+function axes(svg,{xMin,xMax,yMin,yMax,xStep,yStep,xFmt,yFmt,xTitle,yTitle,m}){m=m||{l:52,r:14,t:12,b:38};const vb=svg.viewBox.baseVal,W=vb.width,H=vb.height;
+ const X=x=>m.l+(x-xMin)/(xMax-xMin)*(W-m.l-m.r),Y=y=>H-m.b-(y-yMin)/(yMax-yMin)*(H-m.t-m.b);svg.replaceChildren();
+ for(const t of range(Math.ceil(yMin/yStep)*yStep,yMax,yStep)){svg.append(svgEl("line",{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:"grid"}));svgText(svg,m.l-6,Y(t)+4,yFmt(t),"end");}
+ for(const t of range(Math.ceil(xMin/xStep)*xStep,xMax,xStep))svgText(svg,X(t),H-m.b+16,xFmt(t));
+ if(xTitle)svgText(svg,(m.l+W-m.r)/2,H-4,xTitle);if(yTitle)svgText(svg,12,(m.t+H-m.b)/2,yTitle,"middle",{transform:`rotate(-90 12 ${(m.t+H-m.b)/2})`});
+ svg.append(svgEl("line",{x1:m.l,x2:m.l,y1:m.t,y2:H-m.b,class:"grid"}));return {X,Y,W,H,m};}
+function path(svg,pts,color,width=2.5,dash=""){svg.append(svgEl("path",{d:pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" "),fill:"none",stroke:css(color),"stroke-width":width,"stroke-dasharray":dash}));}
+function dot(svg,x,y,color,r=6){svg.append(svgEl("circle",{cx:x,cy:y,r,fill:css(color),stroke:css("--surface"),"stroke-width":2}));}
+function chipGroup(sel,cb){const cs=[...document.querySelectorAll(sel+" .chip")];cs.forEach(c=>c.addEventListener("click",()=>{cs.forEach(x=>x.setAttribute("aria-pressed",x===c));cb(c);}));return ()=>cs.find(c=>c.getAttribute("aria-pressed")==="true");}
+
+// ===== models =====
+const capm=(rf,b,erp)=>rf+b*erp;
+const unlever=(b,de,t)=>b/(1+(1-t)*de);
+const relever=(bu,de,t)=>bu*(1+(1-t)*de);
+function regress(rows){const n=rows.length;if(n<3)return null;const mx=rows.reduce((a,r)=>a+r[1],0)/n,my=rows.reduce((a,r)=>a+r[0],0)/n;let sxx=0,sxy=0,syy=0;
+ for(const [y,x] of rows){sxx+=(x-mx)**2;sxy+=(x-mx)*(y-my);syy+=(y-my)**2;}if(sxx===0)return null;const beta=sxy/sxx,alpha=my-beta*mx,r2=syy?sxy*sxy/(sxx*syy):0;
+ const sdy=Math.sqrt(syy/(n-1)),sdx=Math.sqrt(sxx/(n-1));return {n,beta,alpha,r2,my,mx,sdy,sdx};}
+function parseReturns(txt){const rows=[];for(const line of txt.split(/\n/)){const nums=line.replace(/%/g,"").split(/[\s,;\t]+/).map(s=>s.trim()).filter(Boolean).map(Number);if(nums.length>=2&&nums.every(Number.isFinite))rows.push([nums[0],nums[1]]);}return rows;}
+function exampleData(){let s=12345;const r=()=>{s=(s*1103515245+12345)%2147483648;return s/2147483648;};const g=()=>{let u=0;for(let i=0;i<12;i++)u+=r();return u-6;};
+ const out=[];for(let i=0;i<60;i++){const m=0.7+4.3*g();const e=4.8*g();const st=0.35+0.85*m+e;out.push(fmt(st,2)+", "+fmt(m,2));}return out.join("\n");}
+
+// ===== tabs =====
+const tabs=[...document.querySelectorAll('nav.tabs button')];
+function showTab(id){tabs.forEach(b=>{const on=b.getAttribute("aria-controls")===id;b.setAttribute("aria-selected",on);document.getElementById(b.getAttribute("aria-controls")).hidden=!on;});try{localStorage.setItem("eq-tab",id);}catch(e){}drawAll();}
+tabs.forEach(b=>b.addEventListener("click",()=>showTab(b.getAttribute("aria-controls"))));
+
+// ===== 1 quiz =====
+const QUIZ=[
+ {q:"Risk-free rate 3%, equity risk premium 5%, beta 1.2. The CAPM cost of equity is:",o:["8.0%","9.0%","9.6%","11.0%"],a:1,e:"3% + 1.2 × 5% = 9% (slide 9)."},
+ {q:"In the market model regression, R² measures:",o:["The stock's average return","The share of the stock's total risk that is systematic","Beta squared","The abnormal return"],a:1,e:"R² is the proportion of return variance explained by the market. 1 − R² is firm-specific risk that diversification removes (slide 11)."},
+ {q:"A stock has a positive Jensen's alpha over your sample period. This means:",o:["It is riskier than the market","It earned more than the CAPM predicted for its beta","Its beta is above 1","It paid a dividend"],a:1,e:"Alpha = actual return − [R_F + β(R_M − R_F)]. Positive alpha is return above the CAPM benchmark (slides 11 and 12)."},
+ {q:"AstraZeneca's beta is 0.21 on Yahoo Finance and 0.83 on Reuters. The most likely reason is:",o:["One of them is a typing error","They use different listings and market indices: the New York line against the S&P 500 versus the London line","Reuters includes debt in the beta","Yahoo measures total volatility, not beta"],a:1,e:"Yahoo regresses AZN (New York, dollars) on the S&P 500; Reuters quotes AZN.L (London, sterling), most likely against a UK index, where AstraZeneca is a large weight. Window and return frequency can also differ (slide 17)."},
+ {q:"AstraZeneca reports in US dollars. Which risk-free rate belongs in its CAPM?",o:["The 10-year UK gilt","The 10-year US Treasury","The Bank of England base rate","Damodaran's implied ERP"],a:1,e:"Match the currency of the cash flows: dollars, so the 10-year US Treasury, 5.24% on 9 October 2026 (slide 10)."},
+ {q:"Payout ratio 20%, return on equity 12%. The sustainable growth rate is:",o:["2.4%","9.6%","12.0%","14.4%"],a:1,e:"g = (1 − payout) × ROE = 0.8 × 12% = 9.6% (slides 13 and 14)."},
+ {q:"AstraZeneca's WACC moves from 5.9% to 8.3% depending on which provider's beta is used, but barely moves with its cost of debt. Why?",o:["Its debt is fixed rate","Equity is about 89% of its capital at market value","Its tax rate is low","Its bonds are callable"],a:1,e:"With debt at about 11% of capital, the cost of equity dominates WACC (slide 18)."},
+ {q:"In Graham's (2022) survey of CFOs, the most common way large firms estimate the cost of equity is:",o:["The dividend discount model","Bond yield plus risk premium","The CAPM","Investor surveys"],a:2,e:"83% of large firms always or almost always use the CAPM, up from 73.5% of all firms in Graham and Harvey (2001) (slide 30)."}];
+let quizAns={};
+function renderQuiz(){const box=$("#quizbox");box.replaceChildren();
+ QUIZ.forEach((it,qi)=>{const q=el("div",{class:"q"});q.append(el("p",{},(qi+1)+". "+it.q));const opts=el("div",{class:"opts",role:"radiogroup"});
+  it.o.forEach((o,oi)=>{const lab=el("label",{class:"opt"});const inp=el("input",{type:"radio",name:"q"+qi,id:`q${qi}o${oi}`});lab.setAttribute("for",`q${qi}o${oi}`);
+   if(quizAns[qi]!==undefined){inp.disabled=true;if(oi===it.a)lab.classList.add("right");if(oi===quizAns[qi]&&oi!==it.a)lab.classList.add("wrong");if(oi===quizAns[qi])inp.checked=true;}
+   inp.addEventListener("change",()=>{quizAns[qi]=oi;renderQuiz();});lab.append(inp,el("span",{},o));opts.append(lab);});
+  q.append(opts);if(quizAns[qi]!==undefined){const ok=quizAns[qi]===it.a;q.append(el("div",{class:"fb "+(ok?"ok":"no")},(ok?"Correct. ":"Not quite. ")+it.e));}
+  box.append(q);});
+ const score=Object.entries(quizAns).filter(([qi,a])=>QUIZ[qi].a===a).length;$("#quizscore").textContent=`Score: ${score} / ${QUIZ.length}`;
+ const reset=el("button",{class:"btn ghost small",style:"margin-top:14px"},"Start again");reset.addEventListener("click",()=>{quizAns={};renderQuiz();});box.append(reset);}
+
+// ===== 2 CAPM =====
+function drawCAPM(){const rf=+$("#cRf").value,erp=+$("#cErp").value,raw=+$("#cB").value,b=raw;
+ $("#cRfv").textContent=fmt(rf)+"%";$("#cErpv").textContent=fmt(erp)+"%";$("#cBv").textContent=fmt(raw);
+ stats($("#cStats"),[["Beta used",fmt(b,3)],["Cost of equity",fmt(capm(rf,b,erp))+"%"],["Premium over risk-free",fmt(b*erp)+" pts"]]);
+ const svg=$("#smlChart"),yMax=Math.ceil((rf+2.5*erp)/2)*2;const {X,Y}=axes(svg,{xMin:0,xMax:2.5,yMin:0,yMax,xStep:0.5,yStep:niceStep(yMax/5),xFmt:x=>fmt(x,1),yFmt:y=>y+"%",xTitle:"Beta",yTitle:"Required return"});
+ path(svg,[[X(0),Y(rf)],[X(2.5),Y(capm(rf,2.5,erp))]],"--teal");svg.append(svgEl("line",{x1:X(1),x2:X(1),y1:Y(0),y2:Y(rf+erp),stroke:css("--slate"),"stroke-dasharray":"3 4"}));svgText(svg,X(1)+4,Y(rf+erp)-8,"Market (β = 1)","start");
+ dot(svg,X(b),Y(capm(rf,b,erp)),"--amber");
+ const B=+$("#rB").value,si=+$("#rSi").value,sm=+$("#rSm").value;const r2=si>0?Math.min(1,B*B*sm*sm/(si*si)):NaN;
+ stats($("#rStats"),[["R²",fmt(r2,3)],["Systematic share",fmt(r2*100,1)+"%"],["Firm-specific share",fmt((1-r2)*100,1)+"%"]]);
+ const rs=$("#rChart"),vb=rs.viewBox.baseVal;rs.replaceChildren();const w=vb.width-20;if(Number.isFinite(r2)){rs.append(svgEl("rect",{x:10,y:30,width:w*r2,height:44,fill:css("--teal"),rx:4}));rs.append(svgEl("rect",{x:10+w*r2,y:30,width:w*(1-r2),height:44,fill:css("--slate"),rx:4}));
+  svgText(rs,10+w*r2/2,58,fmt(r2*100,0)+"%","middle",{style:"fill:#fff;font-size:14px"});if(1-r2>0.08)svgText(rs,10+w*r2+w*(1-r2)/2,58,fmt((1-r2)*100,0)+"%","middle",{style:"fill:#fff;font-size:14px"});}}
+["#cRf","#cErp","#cB","#rB","#rSi","#rSm"].forEach(s=>$(s).addEventListener("input",drawCAPM));
+
+// ===== 3 Levering =====
+let comps=[];
+function loadComps(set){comps=set.map(c=>Object.assign({},c));renderComps();}
+const SLIDE16=[{name:"Thatsit Company",beta:1.4,de:0.5,t:40}];
+const GSKHLN=[{name:"Household products (Haleon pure play), asset beta",beta:0.74,de:0,t:25}];
+const STARTER=[{name:"Comparable A",beta:1.10,de:0.30,t:25},{name:"Comparable B",beta:0.95,de:0.10,t:25},{name:"Comparable C",beta:1.35,de:0.60,t:21}];
+function renderComps(){const tb=$("#compTable");tb.replaceChildren();const hr=el("tr");["Company","Equity beta","D/E","Tax %","Asset beta",""].forEach(h=>hr.append(el("th",{},h)));tb.append(hr);
+ comps.forEach((c,i)=>{const tr=el("tr");const inp=(k,step,w)=>{const x=el("input",{type:k==="name"?"text":"number",step:step||"any",value:c[k],"aria-label":k});x.style.width=w||"80px";x.addEventListener("input",()=>{c[k]=k==="name"?x.value:parseFloat(x.value);drawLev();});return x;};
+  const tdA=el("td");tdA.dataset.i=i;const del=el("button",{class:"btn ghost small","aria-label":"Remove"},"Remove");del.addEventListener("click",()=>{comps.splice(i,1);renderComps();});
+  [inp("name",null,"130px"),inp("beta","0.01"),inp("de","0.05"),inp("t","1")].forEach(x=>{const td=el("td");td.append(x);tr.append(td);});tr.append(tdA);const tdD=el("td");tdD.append(del);tr.append(tdD);tb.append(tr);});
+ drawLev();}
+function drawLev(){const de=+$("#lDE").value,t=+$("#lT").value/100;const valid=comps.filter(c=>Number.isFinite(c.beta)&&Number.isFinite(c.de)&&Number.isFinite(c.t));
+ document.querySelectorAll("#compTable td[data-i]").forEach(td=>{const c=comps[+td.dataset.i];td.textContent=c&&Number.isFinite(c.beta)&&Number.isFinite(c.de)&&Number.isFinite(c.t)?fmt(unlever(c.beta,c.de,c.t/100),4):"n/a";});
+ if(!valid.length){stats($("#lStats"),[["Add a comparable",""]]);$("#levChart").replaceChildren();return;}
+ const bu=valid.reduce((a,c)=>a+unlever(c.beta,c.de,c.t/100),0)/valid.length,bl=relever(bu,de,t);
+ stats($("#lStats"),[["Average asset beta",fmt(bu,4)],["Relevered equity beta",fmt(bl,4)],["Comparables used",String(valid.length)]]);
+ const svg=$("#levChart"),xMax=Math.max(1.5,Math.ceil(de*2)/2),yMax=Math.ceil(relever(bu,xMax,t)*2)/2+0.5;const {X,Y}=axes(svg,{xMin:0,xMax,yMin:0,yMax,xStep:0.25,yStep:0.5,xFmt:x=>fmt(x,2),yFmt:y=>fmt(y,1),xTitle:"Debt / equity",yTitle:"Equity beta"});
+ path(svg,range(0,xMax,0.05).map(x=>[X(x),Y(relever(bu,x,t))]),"--teal");svg.append(svgEl("line",{x1:X(0),x2:X(xMax),y1:Y(bu),y2:Y(bu),stroke:css("--slate"),"stroke-dasharray":"3 4"}));svgText(svg,X(xMax)-4,Y(bu)-6,"Asset beta "+fmt(bu,2),"end");
+ dot(svg,X(de),Y(bl),"--amber");}
+$("#compAdd").addEventListener("click",()=>{comps.push({name:"New comparable",beta:1,de:0.2,t:25});renderComps();});
+$("#compSlide").addEventListener("click",()=>{loadComps(SLIDE16);$("#lDE").value=0.25;$("#lT").value=40;drawLev();});
+$("#compGsk").addEventListener("click",()=>{loadComps(GSKHLN);$("#lDE").value=0.25;$("#lT").value=25;drawLev();});
+["#lDE","#lT"].forEach(s=>$(s).addEventListener("input",drawLev));
+
+// ===== 4 Practice =====
+let attempts={},solKeys={};
+function check(given,truth,kind){if(!Number.isFinite(given))return false;const tol=kind==="pct"?0.015:kind==="beta"?0.006:Math.max(0.005*Math.abs(truth),0.05);return Math.abs(given-truth)<=tol;}
+function ansRow(key,label,truth,kind){const row=el("div",{class:"ans"});const lab=el("label",{for:"a_"+key},label);const inp=el("input",{type:"number",id:"a_"+key,step:"any"});const mark=el("span",{class:"mark"});
+ inp.addEventListener("change",()=>{const ok=check(parseFloat(inp.value),truth,kind);attempts[key]=(attempts[key]||0)+1;mark.className="mark "+(ok?"ok":"no");mark.textContent=ok?"Correct":(attempts[key]>=2?"Try again (solution unlocked)":"Try again");refreshSol();});
+ row.append(lab,inp,mark);row.dataset.key=key;return row;}
+function refreshSol(){for(const [pid,keys] of Object.entries(solKeys)){const d=document.getElementById("sol_"+pid);if(d)d.hidden=!keys.some(k=>(attempts[k]||0)>=2);}}
+function block(title,src,given,rows,sol,pid){const pn=el("div",{class:"panel"});pn.append(el("h3",{},title),el("p",{class:"note",style:"margin-top:0"},src));const g=el("div",{class:"given"});given.forEach(l=>g.append(el("div",{},l)));pn.append(g);rows.forEach(r=>pn.append(r));
+ const det=el("details",{id:"sol_"+pid});det.hidden=true;det.append(el("summary",{},"Worked solution"));const s=el("div",{class:"given"});sol.forEach(l=>s.append(el("div",{},l)));det.append(s);pn.append(det);solKeys[pid]=rows.map(r=>r.dataset.key);return pn;}
+function renderPractice(){const lp=$("#levPrac");lp.replaceChildren();
+ lp.append(block("Practice: unlevering and relevering","Lecture 4, slides 25 and 26.",["Pure-play comparable: equity beta 1.30, D/E 0.40, tax 25%.","Your project: D/E 0.25, tax 25%. Risk-free 4%, equity risk premium 5%."],
+  [ansRow("lv_a","Asset beta",unlever(1.3,0.4,0.25),"beta"),ansRow("lv_b","Project equity beta",relever(unlever(1.3,0.4,0.25),0.25,0.25),"beta"),ansRow("lv_c","Project cost of equity (%)",4+relever(unlever(1.3,0.4,0.25),0.25,0.25)*5,"pct")],
+  ["β_asset = 1.30 / [1 + 0.75 × 0.40] = 1.30 / 1.30 = 1.0000.","β_equity = 1.0000 × [1 + 0.75 × 0.25] = 1.1875.","r_e = 4% + 1.1875 × 5% = 9.9375%."],"lv"));
+ const b=$("#pracBody");b.replaceChildren();
+ b.append(block("Problem 1. CAPM cost of equity","Lecture 4, slides 8 and 9.",["Risk-free rate 4.19%, equity risk premium 4.23%, beta 1.15."],[ansRow("p1","Cost of equity (%)",capm(4.19,1.15,4.23),"pct")],["r_e = 4.19% + 1.15 × 4.23% = 4.19% + 4.8645% = 9.0545%"],"p1"));
+ b.append(block("Problem 2. Systematic risk and Jensen's alpha","Lecture 4, slides 11 and 12.",["Beta 0.9, stock volatility 25%, market volatility 16%.","Average stock return 11%, average market return 9%, risk-free rate 4%."],
+  [ansRow("p2a","R²",0.9*0.9*16*16/(25*25),"beta"),ansRow("p2b","CAPM expected return (%)",4+0.9*5,"pct"),ansRow("p2c","Jensen's alpha (%)",11-(4+0.9*5),"pct")],
+  ["R² = 0.9² × 0.16² / 0.25² = 0.81 × 0.0256 / 0.0625 = 0.3318: about a third of the risk is systematic.","CAPM expected return = 4% + 0.9 × (9% − 4%) = 8.5%.","Alpha = 11% − 8.5% = 2.5% a year above the CAPM benchmark."],"p2"));
+ b.append(block("Problem 3. Dividend discount model","Lecture 4, slides 13 and 14.",["Current dividend £1.50, share price £30, payout ratio 40%, return on equity 15%."],
+  [ansRow("p3a","Sustainable growth rate (%)",9,"pct"),ansRow("p3b","Cost of equity (%)",(1.5*1.09/30+0.09)*100,"pct")],
+  ["g = (1 − 0.40) × 15% = 9.0%.","r_e = £1.50 × 1.09 / £30 + 0.09 = 0.0545 + 0.09 = 14.45%."],"p3"));
+ b.append(block("Problem 4. Bond yield plus risk premium","Lecture 4, slide 15.",["The company's long-term bonds have a yield to worst of 6.2%.","Use a risk premium of 4%."],
+  [ansRow("p4","Cost of equity (%)",10.2,"pct")],["r_e = r_d + premium = 6.2% + 4% = 10.2%. Use the pre-tax yield: the premium is over what bondholders require."],"p4"));
+ b.append(block("Problem 5. Country risk premium","Lecture 4, slide 27.",["Sovereign default spread 2.5%; equity market volatility is 1.6 times government bond volatility.","Risk-free 4.19%, mature-market ERP 4.23%, beta 1.1."],
+  [ansRow("p5a","Country risk premium (%)",4,"pct"),ansRow("p5b","Cost of equity (%)",4.19+1.1*4.23+4,"pct")],
+  ["CRP = 2.5% × 1.6 = 4.0%.","r_e = 4.19% + 1.1 × 4.23% + 4.0% = 12.843%."],"p5"));
+ b.append(block("Problem 6. Break point in the MCC schedule","Lecture 4, slide 28.",["Retained earnings available: £60m. Equity is 75% of each new pound of capital."],
+  [ansRow("p6a","Break point (£m)",80,"num")],["Break point = £60m / 0.75 = £80m. Beyond £80m of new capital the firm must issue new equity, at a higher cost."],"p6"));}
+
+// ===== 5 AZ =====
+const AZ={rf:5.24,rd:5.814,t:0.25,E:248.7,D:29.622,roic:16.48974,ic:68767};AZ.wE=AZ.E/(AZ.E+AZ.D);AZ.wD=1-AZ.wE;
+function azCalc(b,erp){const re=capm(AZ.rf,b,erp),wacc=AZ.wE*re+AZ.wD*AZ.rd*(1-AZ.t);return {re,wacc,ep:(AZ.roic-wacc)/100*AZ.ic};}
+const getAzBeta=chipGroup("#azBeta",c=>{$("#azB").value=c.dataset.b;drawAZ();});
+function drawAZ(){const b=+$("#azB").value,erp=+$("#azErp").value;$("#azBv").textContent=fmt(b,2);$("#azErpv").textContent=fmt(erp)+"%";
+ document.querySelectorAll("#azBeta .chip").forEach(c=>c.setAttribute("aria-pressed",Math.abs(+c.dataset.b-b)<0.006));
+ const r=azCalc(b,erp);const be=(AZ.roic-AZ.wD*AZ.rd*(1-AZ.t))/AZ.wE;const bStar=(be-AZ.rf)/erp;
+ stats($("#azStats"),[["Cost of equity",fmt(r.re)+"%"],["WACC",fmt(r.wacc)+"%"],["ROIC − WACC",fmt(AZ.roic-r.wacc)+" pts"],["Economic profit",(r.ep<0?"−":"")+"$"+fmt(Math.abs(r.ep),0)+"m"],["Beta where EP = 0",fmt(bStar,2)],["vs AstraZeneca's own 7.5%",(r.wacc-7.5>=0?"+":"")+fmt(r.wacc-7.5)+" pts"]]);
+ const svg=$("#azChart");const {X,Y}=axes(svg,{xMin:0,xMax:1.6,yMin:0,yMax:20,xStep:0.2,yStep:4,xFmt:x=>fmt(x,1),yFmt:y=>y+"%",xTitle:"Beta"});
+ svg.append(svgEl("rect",{x:X(0),y:Y(AZ.rd+5),width:X(1.6)-X(0),height:Y(AZ.rd+3)-Y(AZ.rd+5),fill:css("--slate"),opacity:0.18}));
+ svg.append(svgEl("line",{x1:X(0),x2:X(1.6),y1:Y(AZ.roic),y2:Y(AZ.roic),stroke:css("--amber"),"stroke-width":2,"stroke-dasharray":"6 4"}));
+ svg.append(svgEl("line",{x1:X(0),x2:X(1.6),y1:Y(7.5),y2:Y(7.5),stroke:css("--teal"),"stroke-width":1.5,"stroke-dasharray":"2 3"}));svgText(svg,X(1.6)-4,Y(7.5)-6,"AstraZeneca's own WACC 7.5%","end");
+ const bs=range(0,1.6,0.05);path(svg,bs.map(x=>[X(x),Y(azCalc(x,erp).re)]),"--red");path(svg,bs.map(x=>[X(x),Y(azCalc(x,erp).wacc)]),"--teal",3);
+ dot(svg,X(b),Y(r.re),"--red",5);dot(svg,X(b),Y(r.wacc),"--teal");}
+$("#azB").addEventListener("input",drawAZ);$("#azErp").addEventListener("input",drawAZ);
+
+// ===== 6 Your company =====
+const BRIEF=[["Total return volatility (standard deviation)","Annualised volatility, from your returns","Part II"],["Beta and R² from the market-model regression","Beta, R², systematic vs firm-specific share","Part II"],["Return earned vs the market; Jensen's alpha","Average annual returns and alpha","Part II"],["Cost of equity via CAPM","CAPM with your beta","Part II"],["Cost of debt and current cost of capital","Pre-tax cost of debt from the Debt page; WACC","Part II"],["ROIC compared with the cost of capital","ROIC, spread over WACC, economic profit","Part III"]];
+table($("#briefMap"),["The brief asks for","Where it comes from on this page","Section"],BRIEF);
+const Y_FIELDS=["yName","yData","yRf","yErp","yRd","yTax","yE","yD","yEbit","yEtr","yIc","yWhy"];
+function loadY(){try{const s=JSON.parse(localStorage.getItem("eq-worksheet")||"{}");Y_FIELDS.forEach(k=>{if(s[k]!==undefined)document.getElementById(k).value=s[k];});}catch(e){}}
+function saveY(){try{const s={};Y_FIELDS.forEach(k=>s[k]=document.getElementById(k).value);localStorage.setItem("eq-worksheet",JSON.stringify(s));}catch(e){}}
+let ySummary=[];
+function drawY(){const rows=parseReturns($("#yData").value);const reg=regress(rows);const rf=parseFloat($("#yRf").value),erp=parseFloat($("#yErp").value);const rfm=rf/12;
+ const svg=$("#yChart");
+ if(!reg){stats($("#yStats"),[["Paste at least 3 months","stock, index"]]);svg.replaceChildren();}
+ else{const volA=reg.sdy*Math.sqrt(12),volM=reg.sdx*Math.sqrt(12),annS=reg.my*12,annM=reg.mx*12,alphaA=12*((reg.my-rfm)-reg.beta*(reg.mx-rfm));
+  stats($("#yStats"),[["Months",String(reg.n)],["Beta",fmt(reg.beta,3)],["R²",fmt(reg.r2,3)],["Systematic / firm-specific",fmt(reg.r2*100,0)+"% / "+fmt((1-reg.r2)*100,0)+"%"],["Stock volatility, annual",fmt(volA,1)+"%"],["Index volatility, annual",fmt(volM,1)+"%"],["Average return, annual: stock / index",fmt(annS,1)+"% / "+fmt(annM,1)+"%"],["Jensen's alpha, annual",(alphaA>=0?"+":"")+fmt(alphaA,2)+"%"]]);
+  const xs=rows.map(r=>r[1]),ys=rows.map(r=>r[0]);const lim=Math.ceil(Math.max(...xs.map(Math.abs),...ys.map(Math.abs))/5)*5||5;
+  const {X,Y}=axes(svg,{xMin:-lim,xMax:lim,yMin:-lim,yMax:lim,xStep:niceStep(lim/2),yStep:niceStep(lim/2),xFmt:x=>x+"%",yFmt:y=>y+"%",xTitle:"Index return (monthly)",yTitle:"Stock return (monthly)"});
+  rows.forEach(([y,x])=>svg.append(svgEl("circle",{cx:X(x),cy:Y(y),r:3.2,fill:css("--teal"),opacity:0.7})));
+  path(svg,[[X(-lim),Y(reg.alpha-reg.beta*lim)],[X(lim),Y(reg.alpha+reg.beta*lim)]],"--amber",2.5);
+  reg.alphaA=alphaA;reg.volA=volA;reg.annS=annS;reg.annM=annM;}
+ const beta=reg?reg.beta:NaN;const re=capm(rf,beta,erp);
+ const rd=parseFloat($("#yRd").value),tax=parseFloat($("#yTax").value)/100,E=parseFloat($("#yE").value),D=parseFloat($("#yD").value);
+ const wE=E/(E+D),wD=D/(E+D),wacc=wE*re+wD*rd*(1-tax);const ebit=parseFloat($("#yEbit").value),etr=parseFloat($("#yEtr").value)/100,ic=parseFloat($("#yIc").value);
+ const nopat=ebit*(1-etr),roic=nopat/ic*100,ep=(roic-wacc)/100*ic;
+ const rowsT=[["Beta used",reg?fmt(beta,3)+" (regression)":"n/a"],["Cost of equity (CAPM)",Number.isFinite(re)?fmt(re)+"%":"n/a"],["After-tax cost of debt",Number.isFinite(rd*(1-tax))?fmt(rd*(1-tax))+"%":"n/a"],["Weights: equity / debt",Number.isFinite(wE)?fmt(wE*100,1)+"% / "+fmt(wD*100,1)+"%":"n/a"],["WACC",Number.isFinite(wacc)?fmt(wacc)+"%":"n/a"],["NOPAT",Number.isFinite(nopat)?fmt(nopat,0):"n/a"],["ROIC",Number.isFinite(roic)?fmt(roic)+"%":"n/a"],["ROIC − WACC",Number.isFinite(roic-wacc)?fmt(roic-wacc)+" pts":"n/a"],["Economic profit",Number.isFinite(ep)?fmt(ep,0):"n/a"]];
+ table($("#yTable"),["Item","Value"],rowsT);
+ ySummary=[`${$("#yName").value||"My company"}: cost of equity, WACC and ROIC`];if(reg)ySummary.push(`Regression on ${reg.n} months: beta ${fmt(reg.beta,3)}, R² ${fmt(reg.r2,3)}, annual volatility ${fmt(reg.volA,1)}%, average annual return ${fmt(reg.annS,1)}% vs index ${fmt(reg.annM,1)}%, Jensen's alpha ${fmt(reg.alphaA,2)}% a year`);
+ ySummary.push(`Risk-free ${fmt(rf)}%, ERP ${fmt(erp)}%`);rowsT.forEach(r=>ySummary.push(r[0]+": "+r[1]));ySummary.push("Interpretation: "+($("#yWhy").value||"(not written yet)"));saveY();}
+Y_FIELDS.forEach(k=>document.getElementById(k).addEventListener("input",drawY));
+const AZ_RETURNS="1.5182, 2.3246\n-8.9949, -2.2859\n4.8574, 3.9567\n-0.7029, 1.4169\n5.1294, 0.2465\n11.8446, 1.0657\n5.4876, 0.6759\n-2.1894, 1.0205\n3.3097, -6.8324\n0.4074, 3.7095\n-1.8443, -1.0730\n-6.5765, -6.1327\n3.1175, 2.8148\n8.8941, 7.0317\n0.4657, -2.1809\n-5.5981, 4.3353\n2.7384, 1.5697\n3.2353, -2.7662\n4.5762, 3.2723\n-0.7322, -5.0440\n-3.2933, 0.0000\n-0.7982, 2.3427\n-4.6844, -2.4488\n4.1268, 1.2551\n-7.6743, -3.5839\n-1.2098, 1.9983\n4.6810, 3.1785\n-0.9434, -1.3146\n-4.9238, 0.3498\n6.9618, 4.2102\n12.9612, 2.5219\n1.0612, 2.1335\n1.3618, -2.4453\n0.0971, 2.5318\n7.3254, 0.8108\n-12.7015, -2.5957\n-4.7118, -1.3762\n-3.8942, 2.5752\n-1.3570, -1.9169\n8.3684, 6.3296\n5.5007, 1.8855\n-5.9659, -2.8282\n-4.6739, -0.2276\n-0.0746, 3.9376\n-5.5970, -1.3283\n11.8972, 4.2140\n4.1152, 1.2468\n-5.1569, 0.7766\n11.5185, 4.2823\n12.0609, 0.3484\n-1.3167, 1.6937\n-1.3778, 3.0930\n14.2794, 7.1242\n-5.4819, -6.7347\n-5.0511, 2.2195\n-1.0467, 0.7467\n2.1591, -0.3706\n-10.4113, 3.6609\n-5.2407, 0.1889\n2.5898, -2.7898";
+$("#yAZ").addEventListener("click",()=>{const v={yName:"AstraZeneca",yData:AZ_RETURNS,yRf:"5.24",yErp:"4.20",yRd:"5.81",yTax:"25",yE:"248700",yD:"29622",yEbit:"13743",yEtr:"17.49",yIc:"68767"};for(const [k,x] of Object.entries(v))document.getElementById(k).value=x;drawY();});
+$("#yExample").addEventListener("click",()=>{$("#yData").value=exampleData();drawY();});
+$("#yClear").addEventListener("click",()=>{$("#yData").value="";drawY();});
+$("#yCopy").addEventListener("click",()=>{const text=ySummary.join("\n"),st=$("#yCopyStatus");const fallback=()=>{const ta=el("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.append(ta);ta.select();let ok=false;try{ok=document.execCommand("copy");}catch(e){}ta.remove();st.textContent=ok?"Copied.":"Select and copy the results manually.";};
+ if(navigator.clipboard&&navigator.clipboard.writeText)navigator.clipboard.writeText(text).then(()=>st.textContent="Copied.",fallback);else fallback();});
+
+// ===== boot =====
+function drawAll(){const open=tabs.find(b=>b.getAttribute("aria-selected")==="true").getAttribute("aria-controls");if(open==="capm")drawCAPM();if(open==="lev")drawLev();if(open==="az")drawAZ();if(open==="co")drawY();}
+renderQuiz();renderPractice();loadComps(STARTER);loadY();if(!$("#yData").value)$("#yData").value=exampleData();
+try{const t=localStorage.getItem("eq-tab");if(t&&document.getElementById(t))showTab(t);else drawAll();}catch(e){drawAll();}
+const mq=window.matchMedia("(prefers-color-scheme: dark)");mq.addEventListener&&mq.addEventListener("change",drawAll);
+new MutationObserver(drawAll).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>
