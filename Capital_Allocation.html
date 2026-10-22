@@ -1,0 +1,364 @@
+<title>Capital Allocation</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky tab bar over a single 1100px column; each tab is a workbench of panels (controls left, readout right) */
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#16202C; --muted:#5B6B82; --line:#D9E0E8;
+  --navy:#0E1A2B; --teal:#0E8A96; --amber:#C98A22; --red:#C2453B; --slate:#5B6B82; --tint:#E8F3F4;
+  --ok:#1E7F4F; --bad:#B23A30;
+  --f-display:"Newsreader", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C141F; --surface:#131E2C; --ink:#E6ECF2; --muted:#9AA9BC; --line:#26354A;
+  --navy:#E6ECF2; --teal:#4FC3CC; --amber:#E8B04F; --red:#EE7A6E; --slate:#9AA9BC; --tint:#14303A;
+  --ok:#5FD39A; --bad:#F08A80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C141F; --surface:#131E2C; --ink:#E6ECF2; --muted:#9AA9BC; --line:#26354A;
+  --navy:#E6ECF2; --teal:#4FC3CC; --amber:#E8B04F; --red:#EE7A6E; --slate:#9AA9BC; --tint:#14303A;
+  --ok:#5FD39A; --bad:#F08A80; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+.kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+.sub{color:var(--muted);margin:4px 0 0;max-width:62ch}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin:0 -16px 20px;padding:8px 16px 0}
+nav.tabs button{font:inherit;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px 10px;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--teal)}
+nav.tabs button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.tabnum{font-family:var(--f-mono);font-size:12px;color:var(--teal);margin-right:6px}
+section.tab{display:grid;gap:18px}
+h2{font-family:var(--f-display);font-size:26px;font-weight:700;margin:0;text-wrap:balance}
+h3{font-size:16px;font-weight:600;margin:0 0 8px}
+.lede{color:var(--muted);margin:2px 0 0;max-width:70ch}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:820px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.panel.flat{background:var(--tint);border-color:transparent}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field{display:grid;gap:4px;margin-bottom:12px}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.row>.field{flex:1 1 120px}
+input[type=number],input[type=text],select,textarea{font:inherit;font-family:var(--f-mono);font-size:14px;width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+textarea{font-family:var(--f-body);resize:vertical;min-height:60px}
+input[type=range]{width:100%;accent-color:var(--teal)}
+.rangeval{font-family:var(--f-mono);font-size:14px;color:var(--ink)}
+button.btn{font:inherit;font-weight:500;padding:8px 14px;border-radius:6px;border:1px solid var(--teal);background:var(--teal);color:var(--surface);cursor:pointer}
+button.btn.ghost{background:transparent;color:var(--teal)}
+button.btn.small{padding:4px 10px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:var(--surface)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--tint);border-radius:8px;padding:10px 12px}
+.stat .v{font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.stat .k{font-size:12px;color:var(--muted)}
+.rating{display:inline-block;font-family:var(--f-mono);font-weight:500;padding:2px 8px;border-radius:4px;color:#fff}
+.rating.ig{background:#1E7F4F}.rating.bbb{background:#B07A12}.rating.hy{background:#B23A30}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.tablewrap{overflow-x:auto}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--f-body);font-size:11px}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.note{font-size:13px;color:var(--muted)}
+.q{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.q:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.q p{margin:0 0 8px;font-weight:500}
+.opts{display:grid;gap:6px}
+.opt{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:6px;cursor:pointer;background:var(--surface)}
+.opt input{margin-top:4px}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--surface))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
+.fb{font-size:14px;margin-top:6px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.ans{display:grid;grid-template-columns:minmax(0,1fr) 120px auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.ans:last-child{border-bottom:0}
+.ans .mark{font-size:13px;min-width:70px}
+.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+.given{font-family:var(--f-mono);font-size:13px;background:var(--tint);border-radius:6px;padding:8px 10px;margin:6px 0 10px;line-height:1.7}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.role{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface)}
+.role h4{margin:0 0 6px;font-size:15px}
+.role p{margin:0 0 6px;font-size:13.5px}
+.role ul{margin:0;padding-left:18px;font-size:13.5px}
+.bar{height:26px;border-radius:4px;background:var(--teal);min-width:2px;transition:width .3s}
+.barrow{display:grid;grid-template-columns:150px minmax(0,1fr) 44px;gap:10px;align-items:center;margin-bottom:8px;font-size:14px}
+.barrow .n{font-family:var(--f-mono);text-align:right}
+.reasons{display:grid;gap:6px;max-height:260px;overflow:auto;margin-top:10px}
+.reasons div{font-size:13.5px;background:var(--tint);border-radius:6px;padding:6px 10px}
+.status{font-size:13px;color:var(--muted)}
+details summary{cursor:pointer;color:var(--teal);font-weight:500}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:520px){.ans{grid-template-columns:minmax(0,1fr) 100px}.ans .mark{grid-column:1/-1}.barrow{grid-template-columns:110px minmax(0,1fr) 36px}}
+
+.sortkey{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px}
+.keyitem b{font-weight:600}.keyitem span{color:var(--muted)}
+.sortgrid,.predgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.sortcard,.predcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:10px;align-content:start;min-width:0}
+.sortcard .st,.predcard .st{margin:0;font-weight:500}
+.sortcard.done-ok{border-color:var(--ok)}.sortcard.done-no{border-color:var(--bad)}
+.chip.good{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.chip.badc{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.chip:disabled{cursor:default;opacity:1}
+.predcard.revealed{background:var(--tint);border-color:transparent}
+.reveal{font-family:var(--f-mono);font-size:15px;color:var(--teal);font-weight:500}
+.predcard .btn{justify-self:start}
+table.inputs td input,table.inputs th input{min-width:90px}
+table.inputs th input{font-weight:600}
+@media (max-width:520px){.sortgrid,.predgrid{grid-template-columns:minmax(0,1fr)}}
+</style>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="kicker">FIN7F2 Corporate Finance · Assignment 1, Part III seminar</p>
+      <h1>Capital Allocation</h1>
+      <p class="sub">Four activities: how projects are chosen, then what AstraZeneca spends, how long its assets last, whether it earns its cost of capital, and what it plans next. The last tab works through Part III for your own company.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Activities">
+    <button role="tab" id="t-quiz" aria-controls="quiz" aria-selected="true"><span class="tabnum">1</span>Quiz</button>
+    <button role="tab" id="t-npv" aria-controls="npv" aria-selected="false"><span class="tabnum">2</span>NPV lab</button>
+    <button role="tab" id="t-sort" aria-controls="sort" aria-selected="false"><span class="tabnum">3</span>Sort the spend</button>
+    <button role="tab" id="t-co" aria-controls="co" aria-selected="false"><span class="tabnum">4</span>Your company</button>
+  </nav>
+
+  <!-- 1 QUIZ -->
+  <section class="tab" id="quiz" role="tabpanel" aria-labelledby="t-quiz">
+    <div><h2>Quiz</h2><p class="lede">10 questions on the lecture. Each answer locks once chosen and shows the explanation.</p></div>
+    <div class="panel"><div id="quizbox"></div><p class="status" id="quizscore" style="margin-top:12px"></p><button class="btn ghost small" id="quizReset">Start again</button></div>
+  </section>
+
+  <!-- 2 NPV LAB -->
+  <section class="tab" id="npv" role="tabpanel" aria-labelledby="t-npv" hidden>
+    <div><h2>NPV lab: license or build?</h2><p class="lede">The decision from the lecture (slides 6 to 12). Change the discount rate or the cash flows and watch the five rules. Find the rate at which the board should switch projects.</p></div>
+    <div class="panel">
+      <div class="tablewrap"><table id="nCF" class="inputs"></table></div>
+      <div class="row" style="margin-top:12px;align-items:flex-end">
+        <div class="field" style="flex:3 1 260px"><label for="nR">Discount rate: <span class="rangeval" id="nRv"></span></label><input type="range" id="nR" min="0" max="30" step="0.0001" value="8.2614"></div>
+        <div class="chips" id="nChips" style="margin-bottom:12px"><button class="chip" data-v="8.2614" aria-pressed="true">Our WACC 8.26%</button><button class="chip" data-v="7.5" aria-pressed="false">AstraZeneca's own 7.5%</button><button class="chip" data-v="9.5" aria-pressed="false">Top of its range 9.5%</button></div>
+        <button class="btn ghost small" id="nReset" style="margin-bottom:12px">Reset cash flows</button>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Five rules</h3>
+        <div class="tablewrap"><table id="nOut"></table></div>
+        <p class="status" id="nVerdict" style="margin-top:10px"></p>
+      </div>
+      <div class="panel">
+        <svg class="chart" id="nChart" viewBox="0 0 560 300" role="img" aria-label="NPV profiles"></svg>
+        <div class="legend"><span><i style="background:var(--teal)"></i>S: license</span><span><i style="background:var(--amber)"></i>L: build</span><span><i style="background:var(--slate)"></i>Your discount rate</span></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Include or exclude? (slide 14)</h3>
+      <p class="note" style="margin-top:0">Seven items the analyst found while building the cash flows for the licensing deal and the line. Which belong in the NPV?</p>
+      <div class="sortgrid" id="ieGrid"></div>
+      <p class="status" id="ieScore" style="margin-top:10px"></p>
+    </div>
+  </section>
+
+  <!-- 2 SORT -->
+  <section class="tab" id="sort" role="tabpanel" aria-labelledby="t-sort" hidden>
+    <div><h2>Sort the spend</h2><p class="lede">Nine real AstraZeneca outlays. Decide where each one lands in the accounts. The category decides whether it becomes an asset, an expense or a working capital movement (lecture deck, slides 24 and 26).</p></div>
+    <div class="panel flat"><div class="sortkey" id="sortKey"></div></div>
+    <div class="sortgrid" id="sortGrid"></div>
+    <div class="panel"><div class="stats" id="sortStats"></div></div>
+  </section>
+
+  <!-- 8 YOUR COMPANY -->
+  <section class="tab" id="co" role="tabpanel" aria-labelledby="t-co" hidden>
+    <div><h2>Your company: Assignment 1, Part III</h2><p class="lede">Enter three years from your company's cash flow statement, income statement and balance sheet. The page computes the ratios Part III asks for; the analysis and write-up are yours. The page opens with AstraZeneca's figures ($m) as an example.</p></div>
+    <div class="panel">
+      <div class="row" style="align-items:flex-end">
+        <div class="field" style="flex:2 1 220px"><label for="cName">Company</label><input type="text" id="cName" value="AstraZeneca (example)"></div>
+        <div class="field"><label for="cW">WACC from Part II (%)</label><input type="number" id="cW" value="8.2614" step="0.01"></div>
+        <div class="row" style="flex:2 1 260px;margin-bottom:12px"><button class="btn ghost small" id="cAZ">Load AstraZeneca example</button><button class="btn ghost small" id="cClear">Clear</button></div>
+      </div>
+      <div class="tablewrap"><table id="cInputs" class="inputs"></table></div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Results</h3>
+        <div class="tablewrap"><table id="cOut"></table></div>
+      </div>
+      <div class="panel">
+        <h3>Investment by type</h3>
+        <svg class="chart" id="cChart" viewBox="0 0 560 260" role="img" aria-label="Investment by type"></svg>
+        <div class="legend"><span><i style="background:var(--amber)"></i>R&amp;D</span><span><i style="background:var(--teal)"></i>Capex</span><span><i style="background:var(--navy)"></i>Intangibles</span><span><i style="background:var(--slate)"></i>Acquisitions</span></div>
+        <div class="field" style="margin-top:14px"><label for="cWhy">Interpretation: will future investment resemble the past? (three sentences)</label><textarea id="cWhy" placeholder="e.g. Capex is rising to a third above 2025 while R&amp;D holds near 22% of revenue..."></textarea></div>
+        <button class="btn" id="cCopy">Copy summary</button> <span class="status" id="cCopyStatus"></span>
+        <p class="note">Your inputs stay on this device. Copy the summary into your notes before you close the page.</p>
+      </div>
+    </div>
+  </section>
+
+  <p class="note" style="margin-top:28px">Sources: AstraZeneca Annual Report and Form 20-F 2025; AstraZeneca press release, 21 July 2025; aide memoire, March 2026; H1 and Q2 2026 results, 27 July 2026; analyst consensus revenue, Yahoo Finance, October 2026. WACC from Lecture 4.</p>
+</div>
+
+<script>
+// ===== helpers =====
+const $=s=>document.querySelector(s);
+const fmt=(x,d=2)=>Number.isFinite(x)?x.toLocaleString("en-GB",{minimumFractionDigits:d,maximumFractionDigits:d}):"n/a";
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function el(tag,attrs={},text){const e=document.createElement(tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!==undefined)e.textContent=text;return e;}
+function stats(box,items){box.replaceChildren(...items.map(([k,v])=>{const d=el("div",{class:"stat"});d.append(el("div",{class:"v"},v),el("div",{class:"k"},k));return d;}));}
+function table(tb,head,rows){tb.replaceChildren();const hr=el("tr");head.forEach(h=>hr.append(el("th",{},h)));tb.append(hr);rows.forEach(r=>{const tr=el("tr");r.forEach(c=>{const td=el("td");if(c instanceof Node)td.append(c);else td.textContent=c;tr.append(td);});tb.append(tr);});}
+const NS="http://www.w3.org/2000/svg";
+function svgEl(tag,attrs){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+function svgText(svg,x,y,t,anchor="middle",extra={}){const tx=svgEl("text",Object.assign({x,y,"text-anchor":anchor},extra));tx.textContent=t;svg.append(tx);return tx;}
+function niceStep(x){const p=Math.pow(10,Math.floor(Math.log10(x)));const n=x/p;return (n<1.5?1:n<3?2:n<7?5:10)*p;}
+function range(a,b,s){const out=[];for(let v=a;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));return out;}
+function axes(svg,{xMin,xMax,yMin,yMax,xStep,yStep,xFmt,yFmt,xTitle,yTitle,m}){m=m||{l:52,r:14,t:12,b:38};const vb=svg.viewBox.baseVal,W=vb.width,H=vb.height;
+ const X=x=>m.l+(x-xMin)/(xMax-xMin)*(W-m.l-m.r),Y=y=>H-m.b-(y-yMin)/(yMax-yMin)*(H-m.t-m.b);svg.replaceChildren();
+ for(const t of range(Math.ceil(yMin/yStep)*yStep,yMax,yStep)){svg.append(svgEl("line",{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:"grid"}));svgText(svg,m.l-6,Y(t)+4,yFmt(t),"end");}
+ for(const t of range(Math.ceil(xMin/xStep)*xStep,xMax,xStep))svgText(svg,X(t),H-m.b+16,xFmt(t));
+ if(xTitle)svgText(svg,(m.l+W-m.r)/2,H-4,xTitle);if(yTitle)svgText(svg,12,(m.t+H-m.b)/2,yTitle,"middle",{transform:`rotate(-90 12 ${(m.t+H-m.b)/2})`});
+ svg.append(svgEl("line",{x1:m.l,x2:m.l,y1:m.t,y2:H-m.b,class:"grid"}));return {X,Y,W,H,m};}
+function path(svg,pts,color,width=2.5,dash=""){svg.append(svgEl("path",{d:pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" "),fill:"none",stroke:css(color),"stroke-width":width,"stroke-dasharray":dash}));}
+function dot(svg,x,y,color,r=6){svg.append(svgEl("circle",{cx:x,cy:y,r,fill:css(color),stroke:css("--surface"),"stroke-width":2}));}
+function chipGroup(sel,cb){const cs=[...document.querySelectorAll(sel+" .chip")];cs.forEach(c=>c.addEventListener("click",()=>{cs.forEach(x=>x.setAttribute("aria-pressed",x===c));cb(c);}));return ()=>cs.find(c=>c.getAttribute("aria-pressed")==="true");}
+
+
+// ===== tabs =====
+const tabs=[...document.querySelectorAll('nav.tabs button')];
+function showTab(id){tabs.forEach(b=>{const on=b.getAttribute("aria-controls")===id;b.setAttribute("aria-selected",on);document.getElementById(b.getAttribute("aria-controls")).hidden=!on;});try{localStorage.setItem("ca-tab",id);}catch(e){}drawAll();}
+tabs.forEach(b=>b.addEventListener("click",()=>showTab(b.getAttribute("aria-controls"))));
+
+// ===== 1 quiz =====
+const QUIZ=[
+ {q:"Project S has an IRR of 23.1% and L 16.3%. At AstraZeneca's own 7.5% WACC, L has the higher NPV. Which should the board choose if it can fund only one?",o:["S, because its IRR is higher","L, because NPV measures the value added at the right cost of capital","Neither, because the rules disagree","Both, because both IRRs exceed 7.5%"],a:1,e:"For mutually exclusive projects follow NPV. The profiles cross at 7.8%, so below that rate L adds more value (slide 12)."},
+ {q:"AstraZeneca has already spent $300m on early trials of a medicine it is deciding whether to develop further. In the NPV of continuing, the $300m is:",o:["Included as an outflow at year 0","Excluded: it is a sunk cost that will not change whatever is decided","Included as an opportunity cost","Spread over the project's life as depreciation"],a:1,e:"Only incremental cash flows count. Money already spent cannot be recovered by either choice (slide 14)."},
+ {q:"A project is riskier than AstraZeneca's average business. Its cash flows should be discounted at:",o:["The company WACC of 8.26%","A rate above the company WACC that reflects the project's own risk","The risk-free rate","The project's IRR"],a:1,e:"The discount rate reflects the project's risk. Using the company WACC accepts too many risky projects (slide 16)."},
+ {q:"Purchase of PP&E is 3.2 times depreciation. The best reading is:",o:["The asset base is shrinking","The company is replacing worn assets only","The asset base is growing: capacity is being added","Depreciation is overstated"],a:2,e:"Capex above depreciation means the asset base is expanding, not just being maintained (slides 25 and 27)."},
+ {q:"Gross depreciable PP&E is $17,560m and annual depreciation $879m. Average useful life is about:",o:["5 years","10 years","20 years","50 years"],a:2,e:"17,560 / 879 = 20.0 years. Accumulated depreciation / depreciation gives the average age, 10.6 years (slide 27)."},
+ {q:"ROIC 16.5%, WACC 8.26%, average invested capital $68.8bn. Economic profit is about:",o:["$1.1bn","$5.7bn","$11.3bn","$17.0bn"],a:1,e:"(16.49% − 8.26%) × 68,767 = $5,658m (slide 32)."},
+ {q:"A company invests heavily at a return on new investment exactly equal to its WACC. Its growth:",o:["Creates value","Destroys value","Neither creates nor destroys value","Raises ROIC"],a:2,e:"With RONIC = WACC the value driver formula reduces to NOPAT / WACC: growth adds nothing (slide 30)."},
+ {q:"AstraZeneca's ROIC is 16.5% including goodwill and acquired intangibles and 112% excluding them. This mainly shows that:",o:["Its plants are very profitable","Growth bought through acquisitions such as Alexion is expensive in capital","Goodwill should always be excluded","Its tax rate is low"],a:1,e:"Goodwill and acquired intangibles are 85% of invested capital; the operating business itself needs little tangible capital (slide 33)."},
+ {q:"Net reinvestment is 28% of NOPAT and ROIC is 16.5%. Sustainable growth is about:",o:["1.6%","4.6%","8.3%","16.5%"],a:1,e:"g = reinvestment rate × ROIC = 0.28 × 16.5% = 4.6% (slides 35 and 36)."},
+ {q:"Which of these suggests AstraZeneca's future investment will look like its past investment?",o:["Capex rising by a third in 2026","A $4.5bn plant for weight-management medicines","Licensing medicines from Chinese companies","Core R&D staying in the low 20%s of revenue"],a:3,e:"R&D intensity holds steady, while capex scale, therapy focus and sourcing all change (slides 37 and 38)."}];
+let quizAns={};
+function renderQuiz(){const box=$("#quizbox");box.replaceChildren();
+ QUIZ.forEach((it,qi)=>{const q=el("div",{class:"q"});q.append(el("p",{},(qi+1)+". "+it.q));const opts=el("div",{class:"opts",role:"radiogroup"});
+  it.o.forEach((o,oi)=>{const lab=el("label",{class:"opt"});const inp=el("input",{type:"radio",name:"q"+qi,id:`q${qi}o${oi}`});lab.setAttribute("for",`q${qi}o${oi}`);
+   if(quizAns[qi]!==undefined){inp.disabled=true;if(oi===it.a)lab.classList.add("right");if(oi===quizAns[qi]&&oi!==it.a)lab.classList.add("wrong");if(oi===quizAns[qi])inp.checked=true;}
+   inp.addEventListener("change",()=>{quizAns[qi]=oi;renderQuiz();});lab.append(inp,el("span",{},o));opts.append(lab);});
+  q.append(opts);if(quizAns[qi]!==undefined){const ok=quizAns[qi]===it.a;q.append(el("div",{class:"fb "+(ok?"ok":"no")},(ok?"Correct. ":"Not quite. ")+it.e));}
+  box.append(q);});
+ const score=Object.entries(quizAns).filter(([qi,a])=>QUIZ[qi].a===a).length;$("#quizscore").textContent=`Score: ${score} / ${QUIZ.length}`;}
+$("#quizReset").addEventListener("click",()=>{quizAns={};renderQuiz();});
+
+
+// ===== 2 NPV lab =====
+const NDEF={S:[-1.2,0.61,0.45,0.35,0.25,0.2,0.1,0.05],L:[-1.2,0.1,0.25,0.35,0.4,0.4,0.4,0.4]};
+let NCF=JSON.parse(JSON.stringify(NDEF));
+const npvF=(r,cf)=>cf.reduce((a,c,t)=>a+c/Math.pow(1+r,t),0);
+function irrF(cf){let lo=-0.99,hi=10;let flo=npvF(lo,cf),fhi=npvF(hi,cf);if(flo*fhi>0)return NaN;for(let i=0;i<200;i++){const m=(lo+hi)/2,fm=npvF(m,cf);if(flo*fm<=0){hi=m;}else{lo=m;flo=fm;}}return (lo+hi)/2;}
+function pbF(cf,r){let cum=0;for(let t=0;t<cf.length;t++){const c=r===undefined?cf[t]:cf[t]/Math.pow(1+r,t);if(t>0&&cum+c>=0&&c>0)return t-1+(-cum)/c;cum+=c;}return NaN;}
+function buildNCF(){const t=$("#nCF");t.replaceChildren();const hr=el("tr");hr.append(el("th",{},"$bn"));for(let y=0;y<8;y++)hr.append(el("th",{},"Yr "+y));t.append(hr);
+ [["S","S: in-license a medicine"],["L","L: build a manufacturing line"]].forEach(([k,n])=>{const tr=el("tr");tr.append(el("td",{},n));for(let y=0;y<8;y++){const td=el("td");const inp=el("input",{type:"number",id:`n_${k}_${y}`,step:"0.01","aria-label":n+" year "+y});inp.value=NCF[k][y];inp.addEventListener("input",()=>{const v=parseFloat(inp.value);NCF[k][y]=Number.isFinite(v)?v:0;drawNPV();});td.append(inp);tr.append(td);}t.append(tr);});}
+const gN=chipGroup("#nChips",c=>{$("#nR").value=c.dataset.v;drawNPV();});
+$("#nR").addEventListener("input",()=>{document.querySelectorAll("#nChips .chip").forEach(c=>c.setAttribute("aria-pressed",Math.abs(+c.dataset.v-+$("#nR").value)<0.005));drawNPV();});
+$("#nReset").addEventListener("click",()=>{NCF=JSON.parse(JSON.stringify(NDEF));buildNCF();drawNPV();});
+function drawNPV(){const R=+$("#nR").value,r=R/100;$("#nRv").textContent=fmt(R,2)+"%";
+ const m={};["S","L"].forEach(k=>{const cf=NCF[k];const cost=-cf[0];m[k]={npv:npvF(r,cf),irr:irrF(cf),pi:cost>0?npvF(r,[0,...cf.slice(1)])/cost:NaN,pb:pbF(cf),dpb:pbF(cf,r)};});
+ const yrs=x=>Number.isFinite(x)?fmt(x,1)+" years":"never";const better=(a,b,hi=true)=>!Number.isFinite(a)||!Number.isFinite(b)?"n/a":(hi?(a>b?"S":"L"):(a<b?"S":"L"));
+ table($("#nOut"),["Rule","S","L","Prefers"],[["NPV ($m)",fmt(m.S.npv*1000,0),fmt(m.L.npv*1000,0),better(m.S.npv,m.L.npv)],["IRR",fmt(m.S.irr*100,1)+"%",fmt(m.L.irr*100,1)+"%",better(m.S.irr,m.L.irr)],["Profitability index",fmt(m.S.pi,2),fmt(m.L.pi,2),better(m.S.pi,m.L.pi)],["Payback",yrs(m.S.pb),yrs(m.L.pb),better(m.S.pb,m.L.pb,false)],["Discounted payback",yrs(m.S.dpb),yrs(m.L.dpb),better(m.S.dpb,m.L.dpb,false)]]);
+ const diff=NCF.S.map((c,i)=>c-NCF.L[i]);const cross=irrF(diff);
+ const accS=m.S.npv>0,accL=m.L.npv>0;
+ $("#nVerdict").textContent=(!accS&&!accL)?"Neither project has a positive NPV at this rate: fund neither.":"Board's choice by NPV: "+(m.S.npv>=m.L.npv?"S, the licensing deal":"L, the manufacturing line")+(Number.isFinite(cross)&&cross>0?". The profiles cross at "+fmt(cross*100,2)+"%.":".");
+ const svg=$("#nChart");const xs=range(0,30,0.5);const ps=k=>xs.map(x=>[x,npvF(x/100,NCF[k])*1000]);const all=[...ps("S"),...ps("L")].map(p=>p[1]);
+ const yMax=Math.ceil(Math.max(...all,100)/200)*200,yMin=Math.floor(Math.min(...all,0)/200)*200;
+ const {X,Y}=axes(svg,{xMin:0,xMax:30,yMin,yMax,xStep:5,yStep:niceStep((yMax-yMin)/6),xFmt:x=>x+"%",yFmt:y=>(y<0?"−$":"$")+fmt(Math.abs(y),0)+"m",xTitle:"Discount rate",m:{l:62,r:14,t:12,b:38}});
+ svg.append(svgEl("line",{x1:X(0),x2:X(30),y1:Y(0),y2:Y(0),stroke:css("--ink"),"stroke-width":1}));
+ path(svg,ps("S").map(p=>[X(p[0]),Y(p[1])]),"--teal",3);path(svg,ps("L").map(p=>[X(p[0]),Y(p[1])]),"--amber",3);
+ svg.append(svgEl("line",{x1:X(R),x2:X(R),y1:Y(yMin),y2:Y(yMax),stroke:css("--slate"),"stroke-width":1.5,"stroke-dasharray":"4 4"}));
+ if(Number.isFinite(cross)&&cross>0&&cross<0.3){const cy=npvF(cross,NCF.S)*1000;dot(svg,X(cross*100),Y(cy),"--ink",5);svgText(svg,X(cross*100)+8,Y(cy)-8,"crossover "+fmt(cross*100,1)+"%","start");}}
+const IE=[
+ {t:"$300m already spent on Phase II trials of the medicine before the licensing talks",a:"ex",e:"Sunk: spent whatever the board decides."},
+ {t:"Rent the factory floor for the new line could earn if leased to another company",a:"in",e:"Opportunity cost: the space has an alternative use."},
+ {t:"Sales lost by an existing AstraZeneca medicine when the licensed one launches",a:"in",e:"Cannibalisation is an incremental effect of the project."},
+ {t:"Interest on the bonds that fund the line",a:"ex",e:"Financing costs are in the discount rate; deducting interest too would count them twice."},
+ {t:"Inventory built before launch and run down at the end",a:"in",e:"Working capital: an outflow early, an inflow later."},
+ {t:"A share of head-office costs that does not change whichever project is chosen",a:"ex",e:"Not incremental: the cost exists either way."},
+ {t:"Tax saved because the line is depreciated",a:"in",e:"The depreciation tax shield is a real cash saving."}];
+let ieAns={};
+function renderIE(){const g=$("#ieGrid");g.replaceChildren();IE.forEach((it,i)=>{const c=el("div",{class:"sortcard"});c.append(el("p",{class:"st"},it.t));const ch=el("div",{class:"chips"});
+ [["in","Include"],["ex","Exclude"]].forEach(([k,n])=>{const b=el("button",{class:"chip",type:"button","aria-pressed":String(ieAns[i]===k)},n);if(ieAns[i]!==undefined){b.disabled=true;if(k===it.a)b.classList.add("good");else if(k===ieAns[i])b.classList.add("badc");}b.addEventListener("click",()=>{ieAns[i]=k;renderIE();});ch.append(b);});
+ c.append(ch);if(ieAns[i]!==undefined){const ok=ieAns[i]===it.a;c.classList.add(ok?"done-ok":"done-no");c.append(el("div",{class:"fb "+(ok?"ok":"no")},(ok?"Correct. ":"Not quite. ")+it.e));}g.append(c);});
+ const n=Object.keys(ieAns).length,ok=Object.entries(ieAns).filter(([i,k])=>IE[i].a===k).length;$("#ieScore").textContent=`Answered ${n} of ${IE.length}; correct ${ok}.`;}
+
+// ===== 2 sort =====
+const CATS=[["capex","Capex (PP&E)","Asset, depreciated"],["rd","R&D expense","Expensed in the year"],["intang","Intangible purchase","Asset, amortised"],["acq","Acquisition or contingent consideration","Goodwill and intangibles"],["wc","Working capital","Current assets"]];
+const SPEND=[
+ {t:"Building the $4.5bn drug-substance plant in Virginia",a:"capex",e:"A physical plant: purchase of PP&E, depreciated once in use. Until then it sits in assets under construction."},
+ {t:"Phase III trial costs for baxdrostat",a:"rd",e:"Clinical trial spending is expensed as R&D: until a drug is approved there is no reliable asset to record."},
+ {t:"$688m of milestone payments to Daiichi Sankyo for Enhertu, due because the drug hit agreed sales and approval targets",a:"intang",e:"Milestones are payments a partner earns when a licensed drug reaches agreed targets. They buy more of the product's rights, so they are capitalised as intangible assets (purchase of intangibles)."},
+ {t:"$2,051m cash paid to buy Fusion Pharmaceuticals",a:"acq",e:"A business combination: cash goes to acquisition of subsidiaries, creating goodwill ($947m) and intangibles."},
+ {t:"$1,054m paid to BMS for a share of the diabetes alliance",a:"acq",e:"Payment of contingent consideration from a past business combination."},
+ {t:"$1.2bn upfront to CSPC Pharmaceuticals for licensed medicines",a:"intang",e:"In-licensing: $1.1bn capitalised within intangible assets in Q2 2026."},
+ {t:"Salaries of scientists in early research",a:"rd",e:"Research is always expensed."},
+ {t:"Next-generation cell therapy plant in Rockville, Maryland",a:"capex",e:"Manufacturing capacity: purchase of PP&E, part of the $50bn US plan."},
+ {t:"Building up inventories ahead of launches ($755m in 2025)",a:"wc",e:"An increase in inventories ties up cash in working capital, not long-term assets."}];;
+let sortAns={};
+function renderSort(){const key=$("#sortKey");key.replaceChildren(...CATS.map(([k,n,d])=>{const s=el("span",{class:"keyitem"});s.append(el("b",{},n),el("span",{}," "+d));return s;}));
+ const g=$("#sortGrid");g.replaceChildren();
+ SPEND.forEach((it,i)=>{const c=el("div",{class:"sortcard"});c.append(el("p",{class:"st"},it.t));const ch=el("div",{class:"chips"});
+  CATS.forEach(([k,n])=>{const b=el("button",{class:"chip",type:"button","aria-pressed":String(sortAns[i]===k)},n);if(sortAns[i]!==undefined){b.disabled=true;if(k===it.a)b.classList.add("good");else if(k===sortAns[i])b.classList.add("badc");}
+   b.addEventListener("click",()=>{sortAns[i]=k;renderSort();});ch.append(b);});
+  c.append(ch);if(sortAns[i]!==undefined){const ok=sortAns[i]===it.a;c.classList.add(ok?"done-ok":"done-no");c.append(el("div",{class:"fb "+(ok?"ok":"no")},(ok?"Correct. ":"Not quite. ")+it.e));}
+  g.append(c);});
+ const n=Object.keys(sortAns).length,ok=Object.entries(sortAns).filter(([i,k])=>SPEND[i].a===k).length;
+ const cap=SPEND.filter(x=>x.a!=="rd"&&x.a!=="wc").length;
+ stats($("#sortStats"),[["Sorted",`${n} / ${SPEND.length}`],["Correct",String(ok)],["Items that become long-term assets",`${cap} of ${SPEND.length}`],["Items expensed straight away",String(SPEND.filter(x=>x.a==="rd").length)]]);}
+
+// ===== 8 your company =====
+const CROWS=[["rev","Revenue"],["rd","R&D expense"],["ppe","Purchase of PP&E"],["ia","Purchase of intangibles"],["acq","Acquisitions incl. contingent consideration"],["dep","Depreciation"],["am","Amortisation"],["dwc","Increase in working capital (cash outflow +)"],["ebit","Operating profit (EBIT)"],["etr","Effective tax rate (%)"],["eq","Total equity, year end"],["nd","Net debt incl. leases, year end"],["gi","Goodwill + intangibles, year end"]];
+const AZC={yr:["2023","2024","2025"],rev:[45811,54073,58739],rd:[10935,13583,14232],ppe:[1361,1924,2810],ia:[2417,2662,3095],acq:[1015,3779,1230],dep:[733,799,879],am:[3926,3923,4207],dwc:[-300,893,1137],ebit:[8193,10003,13743],etr:[13.596,18.985,17.489],eq:[39166,40871,48719],nd:[22510,24570,23374],gi:[58137,58202,59088]};
+function buildInputs(){const t=$("#cInputs");t.replaceChildren();const hr=el("tr");hr.append(el("th",{},"$m (or %)"));for(let j=0;j<3;j++){const th=el("th");const inp=el("input",{type:"text",id:"cy"+j,"aria-label":"Year "+(j+1)});th.append(inp);hr.append(th);}t.append(hr);
+ CROWS.forEach(([k,n])=>{const tr=el("tr");tr.append(el("td",{},n));for(let j=0;j<3;j++){const td=el("td");td.append(el("input",{type:"number",id:`c_${k}_${j}`,step:"any","aria-label":n+" year "+(j+1)}));tr.append(td);}t.append(tr);});
+ t.addEventListener("input",()=>{drawCo();saveCo();});}
+function fillCo(src){for(let j=0;j<3;j++){$("#cy"+j).value=src?src.yr[j]:"Year "+(j+1);CROWS.forEach(([k])=>{document.getElementById(`c_${k}_${j}`).value=src?src[k][j]:"";});}}
+function readCo(){const o={yr:[0,1,2].map(j=>$("#cy"+j).value)};CROWS.forEach(([k])=>o[k]=[0,1,2].map(j=>parseFloat(document.getElementById(`c_${k}_${j}`).value)));return o;}
+let cSummary=[];
+function drawCo(){const c=readCo(),W=parseFloat($("#cW").value);const P=(x)=>Number.isFinite(x)?fmt(x*100,1)+"%":"n/a",N=(x,d=0)=>Number.isFinite(x)?fmt(x,d):"n/a";
+ const yrs=[0,1,2].map(j=>{const inv=c.rd[j]+c.ppe[j]+c.ia[j]+c.acq[j];const nopat=c.ebit[j]*(1-c.etr[j]/100);const ic=c.eq[j]+c.nd[j];const netre=c.ppe[j]+c.ia[j]+c.acq[j]-c.dep[j]-c.am[j]+c.dwc[j];return {inv,nopat,ic,gi:c.gi[j],netre};});
+ const rows=[["Total investment ($m)",...yrs.map(y=>N(y.inv))],["Investment / revenue",...yrs.map((y,j)=>P(y.inv/c.rev[j]))],["R&D / revenue",...[0,1,2].map(j=>P(c.rd[j]/c.rev[j]))],["Capex / revenue",...[0,1,2].map(j=>P(c.ppe[j]/c.rev[j]))],["Capex / depreciation",...[0,1,2].map(j=>Number.isFinite(c.ppe[j]/c.dep[j])?fmt(c.ppe[j]/c.dep[j],2)+"×":"n/a")],["NOPAT ($m)",...yrs.map(y=>N(y.nopat))]];
+ const roic=[NaN,1,2].map(j=>Number.isNaN(j)?NaN:yrs[j].nopat/((yrs[j].ic+yrs[j-1].ic)/2));const roicx=[NaN,1,2].map(j=>Number.isNaN(j)?NaN:yrs[j].nopat/((yrs[j].ic+yrs[j-1].ic-yrs[j].gi-yrs[j-1].gi)/2));
+ const ep=[NaN,1,2].map(j=>Number.isNaN(j)?NaN:(roic[j]-W/100)*(yrs[j].ic+yrs[j-1].ic)/2);const rr=yrs.map(y=>y.netre/y.nopat);
+ rows.push(["ROIC (average invested capital)",...roic.map(P)],["ROIC excluding goodwill and intangibles",...roicx.map(P)],["Economic profit at your WACC ($m)",...ep.map(x=>N(x))],["Net reinvestment ($m)",...yrs.map(y=>N(y.netre))],["Reinvestment rate",...rr.map(P)]);
+ const g=rr[2]*roic[2];
+ table($("#cOut"),["",...c.yr],rows);
+ const gRow=el("tr");gRow.append(el("td",{},"Implied growth: reinvestment rate × ROIC (latest year)"),el("td"),el("td"),el("td",{},P(g)));$("#cOut").append(gRow);
+ cSummary=[`${$("#cName").value} (Part III ratios)`,...rows.map(r=>r[0]+": "+r.slice(1).join(" | ")),"Implied growth: "+P(g),"WACC used: "+fmt(W,2)+"%","Interpretation: "+($("#cWhy").value||"(not written yet)")];
+ const svg=$("#cChart");const tot=yrs.map(y=>y.inv).filter(Number.isFinite);const yMax=tot.length?niceStep(Math.max(...tot)/4)*5:10;
+ const {X,Y}=axes(svg,{xMin:0,xMax:3,yMin:0,yMax,xStep:5,yStep:niceStep(yMax/5),xFmt:()=>"",yFmt:y=>fmt(y,0),m:{l:58,r:14,t:12,b:30}});
+ [0,1,2].forEach(j=>{let base=0;const cx=X(j+0.5),w=70;[["rd","--amber"],["ppe","--teal"],["ia","--navy"],["acq","--slate"]].forEach(([k,col])=>{const v=c[k][j];if(!Number.isFinite(v)||v<=0)return;svg.append(svgEl("rect",{x:cx-w/2,y:Y(base+v),width:w,height:Y(base)-Y(base+v),fill:css(col)}));base+=v;});svgText(svg,cx,Y(0)+18,c.yr[j]||"");});}
+function saveCo(){try{const o=readCo();o.name=$("#cName").value;o.w=$("#cW").value;o.why=$("#cWhy").value;localStorage.setItem("ca-co",JSON.stringify(o));}catch(e){}}
+function loadCo(){fillCo(AZC);try{const o=JSON.parse(localStorage.getItem("ca-co")||"null");if(o&&o.rev){for(let j=0;j<3;j++){$("#cy"+j).value=o.yr[j]||"";CROWS.forEach(([k])=>{const v=o[k][j];document.getElementById(`c_${k}_${j}`).value=Number.isFinite(v)?v:"";});}$("#cName").value=o.name||"";$("#cW").value=o.w||"8.2614";$("#cWhy").value=o.why||"";}}catch(e){}}
+$("#cAZ").addEventListener("click",()=>{fillCo(AZC);$("#cName").value="AstraZeneca (example)";$("#cW").value="8.2614";drawCo();saveCo();});
+$("#cClear").addEventListener("click",()=>{fillCo(null);$("#cName").value="";drawCo();saveCo();});
+["#cName","#cW","#cWhy"].forEach(s=>$(s).addEventListener("input",()=>{drawCo();saveCo();}));
+$("#cCopy").addEventListener("click",()=>{const text=cSummary.join("\n"),st=$("#cCopyStatus");const fallback=()=>{const ta=el("textarea");ta.value=text;ta.style.position="fixed";ta.style.opacity="0";document.body.append(ta);ta.select();let ok=false;try{ok=document.execCommand("copy");}catch(e){}ta.remove();st.textContent=ok?"Copied.":"Select and copy the results manually.";};
+ if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(()=>{st.textContent="Copied.";}).catch(fallback);}else fallback();});
+
+// ===== boot =====
+function drawAll(){const open=tabs.find(b=>b.getAttribute("aria-selected")==="true").getAttribute("aria-controls");if(open==="npv")drawNPV();if(open==="co")drawCo();}
+renderQuiz();buildNCF();renderIE();renderSort();buildInputs();loadCo();
+try{const t=localStorage.getItem("ca-tab");if(t&&document.getElementById(t))showTab(t);else drawAll();}catch(e){drawAll();}
+const mq=window.matchMedia("(prefers-color-scheme: dark)");mq.addEventListener&&mq.addEventListener("change",drawAll);
+new MutationObserver(drawAll).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>
