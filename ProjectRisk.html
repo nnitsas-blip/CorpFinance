@@ -1,0 +1,411 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Project Risk Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky tab bar over a single 1100px column; each tab is a workbench of panels (controls left, readout right) */
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#16202C; --muted:#5B6B82; --line:#D9E0E8;
+  --navy:#0E1A2B; --teal:#0E8A96; --amber:#C98A22; --red:#C2453B; --slate:#5B6B82; --tint:#E8F3F4;
+  --ok:#1E7F4F; --bad:#B23A30;
+  --f-display:"Newsreader", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C141F; --surface:#131E2C; --ink:#E6ECF2; --muted:#9AA9BC; --line:#26354A;
+  --navy:#E6ECF2; --teal:#4FC3CC; --amber:#E8B04F; --red:#EE7A6E; --slate:#9AA9BC; --tint:#14303A;
+  --ok:#5FD39A; --bad:#F08A80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C141F; --surface:#131E2C; --ink:#E6ECF2; --muted:#9AA9BC; --line:#26354A;
+  --navy:#E6ECF2; --teal:#4FC3CC; --amber:#E8B04F; --red:#EE7A6E; --slate:#9AA9BC; --tint:#14303A;
+  --ok:#5FD39A; --bad:#F08A80; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+.kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+.sub{color:var(--muted);margin:4px 0 0;max-width:62ch}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin:0 -16px 20px;padding:8px 16px 0}
+nav.tabs button{font:inherit;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px 10px;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--teal)}
+nav.tabs button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.tabnum{font-family:var(--f-mono);font-size:12px;color:var(--teal);margin-right:6px}
+section.tab{display:grid;gap:18px}
+h2{font-family:var(--f-display);font-size:26px;font-weight:700;margin:0;text-wrap:balance}
+h3{font-size:16px;font-weight:600;margin:0 0 8px}
+.lede{color:var(--muted);margin:2px 0 0;max-width:70ch}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:820px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.panel.flat{background:var(--tint);border-color:transparent}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field{display:grid;gap:4px;margin-bottom:12px}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.row>.field{flex:1 1 120px}
+input[type=number],input[type=text],select,textarea{font:inherit;font-family:var(--f-mono);font-size:14px;width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+textarea{font-family:var(--f-body);resize:vertical;min-height:60px}
+input[type=range]{width:100%;accent-color:var(--teal)}
+.rangeval{font-family:var(--f-mono);font-size:14px;color:var(--ink)}
+button.btn{font:inherit;font-weight:500;padding:8px 14px;border-radius:6px;border:1px solid var(--teal);background:var(--teal);color:var(--surface);cursor:pointer}
+button.btn.ghost{background:transparent;color:var(--teal)}
+button.btn.small{padding:4px 10px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:var(--surface)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--tint);border-radius:8px;padding:10px 12px}
+.stat .v{font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.stat .k{font-size:12px;color:var(--muted)}
+.rating{display:inline-block;font-family:var(--f-mono);font-weight:500;padding:2px 8px;border-radius:4px;color:#fff}
+.rating.ig{background:#1E7F4F}.rating.bbb{background:#B07A12}.rating.hy{background:#B23A30}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.tablewrap{overflow-x:auto}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--f-body);font-size:11px}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.note{font-size:13px;color:var(--muted)}
+.q{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.q:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.q p{margin:0 0 8px;font-weight:500}
+.opts{display:grid;gap:6px}
+.opt{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:6px;cursor:pointer;background:var(--surface)}
+.opt input{margin-top:4px}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--surface))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
+.fb{font-size:14px;margin-top:6px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.ans{display:grid;grid-template-columns:minmax(0,1fr) 120px auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.ans:last-child{border-bottom:0}
+.ans .mark{font-size:13px;min-width:70px}
+.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+.given{font-family:var(--f-mono);font-size:13px;background:var(--tint);border-radius:6px;padding:8px 10px;margin:6px 0 10px;line-height:1.7}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.role{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface)}
+.role h4{margin:0 0 6px;font-size:15px}
+.role p{margin:0 0 6px;font-size:13.5px}
+.role ul{margin:0;padding-left:18px;font-size:13.5px}
+.bar{height:26px;border-radius:4px;background:var(--teal);min-width:2px;transition:width .3s}
+.barrow{display:grid;grid-template-columns:150px minmax(0,1fr) 44px;gap:10px;align-items:center;margin-bottom:8px;font-size:14px}
+.barrow .n{font-family:var(--f-mono);text-align:right}
+.reasons{display:grid;gap:6px;max-height:260px;overflow:auto;margin-top:10px}
+.reasons div{font-size:13.5px;background:var(--tint);border-radius:6px;padding:6px 10px}
+.status{font-size:13px;color:var(--muted)}
+details summary{cursor:pointer;color:var(--teal);font-weight:500}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:520px){.ans{grid-template-columns:minmax(0,1fr) 100px}.ans .mark{grid-column:1/-1}.barrow{grid-template-columns:110px minmax(0,1fr) 36px}}
+
+.sortkey{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px}
+.keyitem b{font-weight:600}.keyitem span{color:var(--muted)}
+.sortgrid,.predgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.sortcard,.predcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:10px;align-content:start;min-width:0}
+.sortcard .st,.predcard .st{margin:0;font-weight:500}
+.sortcard.done-ok{border-color:var(--ok)}.sortcard.done-no{border-color:var(--bad)}
+.chip.good{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.chip.badc{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.chip:disabled{cursor:default;opacity:1}
+.predcard.revealed{background:var(--tint);border-color:transparent}
+.reveal{font-family:var(--f-mono);font-size:15px;color:var(--teal);font-weight:500}
+.predcard .btn{justify-self:start}
+table.inputs td input,table.inputs th input{min-width:90px}
+table.inputs th input{font-weight:600}
+@media (max-width:520px){.sortgrid,.predgrid{grid-template-columns:minmax(0,1fr)}}
+tr.total td{font-weight:600;background:var(--tint)}
+tr.sub td{font-weight:600}
+#bTable td:first-child,#sFixed td:first-child,#wTable td:first-child{white-space:nowrap}
+table.spot tr.pick{cursor:pointer}
+table.spot tr.pick:hover td{background:color-mix(in srgb,var(--amber) 8%,var(--surface))}
+table.spot tr.pick[aria-pressed="true"] td{background:color-mix(in srgb,var(--amber) 22%,var(--surface))}
+table.spot tr.pick:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
+table.spot td.mk{font-size:12px;color:var(--amber);font-weight:600;white-space:nowrap}
+table.spot tr.pick.hit td{background:color-mix(in srgb,var(--ok) 14%,var(--surface))}
+table.spot tr.hit td.mk{color:var(--ok)}
+table.spot tr.pick.miss td{background:color-mix(in srgb,var(--bad) 14%,var(--surface))}
+table.spot tr.miss td.mk,table.spot tr.false td.mk{color:var(--bad)}
+table.spot tr.pick.false td{background:color-mix(in srgb,var(--bad) 8%,var(--surface))}
+table.spot tr.why td{text-align:left;font-size:13.5px;color:var(--ink);background:var(--bg);white-space:normal;padding:6px 10px 10px 18px}
+#wTry .field,#bTry .field{flex:1 1 90px;margin-bottom:6px}
+table.spot tr.pick.okrow td{background:var(--surface)}
+.facts{margin:6px 0 0;padding-left:20px;display:grid;gap:6px;max-width:80ch}
+#mcTable input{min-width:78px}
+#mcRules .field{flex:1 1 150px}
+
+#sSliders .field{margin-bottom:14px}
+#scIn input{min-width:90px}
+#c1 .field,#c2 .field,#c3 .field,#c4 .field,#c5 .field{flex:1 1 200px}
+</style>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="kicker">FIN7F2 Corporate Finance · Lecture: Project Risk</p>
+      <h1>Project Risk Lab</h1>
+      <p class="sub">Five activities on sensitivity, scenarios, simulation and real options, with new cases and numbers. Tabs 2 to 4 use an e-scooter fleet; tab 5 is a vertical farm. All figures are in $m.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Activities">
+    <button role="tab" id="t-quiz" aria-controls="quiz" aria-selected="true"><span class="tabnum">1</span>Quiz</button>
+    <button role="tab" id="t-sens" aria-controls="sens" aria-selected="false"><span class="tabnum">2</span>Sensitivity</button>
+    <button role="tab" id="t-sim" aria-controls="sim" aria-selected="false"><span class="tabnum">3</span>Scenarios and simulation</button>
+    <button role="tab" id="t-opt" aria-controls="opt" aria-selected="false"><span class="tabnum">4</span>Option to abandon</button>
+    <button role="tab" id="t-case" aria-controls="case" aria-selected="false"><span class="tabnum">5</span>Mini case</button>
+  </nav>
+
+  <!-- 1 QUIZ -->
+  <section class="tab" id="quiz" role="tabpanel" aria-labelledby="t-quiz">
+    <div><h2>Quiz</h2><p class="lede">Ten mini exercises, each with its own numbers. Each answer locks once chosen and shows the working and the slide to revisit.</p></div>
+    <div class="panel"><div id="quizbox"></div><p class="status" id="quizscore" style="margin-top:12px"></p><button class="btn ghost small" id="quizReset">Start again</button></div>
+  </section>
+
+  <!-- 2 SENSITIVITY -->
+  <section class="tab" id="sens" role="tabpanel" aria-labelledby="t-sens" hidden>
+    <div><h2>Sensitivity: an e-scooter fleet</h2><p class="lede">Move one input at a time and watch the NPV and the break-even points (slides 8 to 11). The tornado chart ranks the inputs for the change you choose.</p></div>
+    <div class="panel flat"><p style="margin:0"><b>The case ($m, fictional).</b> A mobility company is deciding whether to launch an e-scooter fleet in a new city. Fleet and depot cost <b>$6m</b> now, depreciated straight line over <b>3 years</b>. Base case: <b>4.0 million rides</b> a year at <b>$3.00</b> a ride; variable cost (charging, repairs) <b>$1.40</b> a ride; fixed cash costs (depot, staff, city licence) <b>$2m</b> a year. Tax <b>25%</b>; discount rate <b>12%</b>. Base-case NPV: <b>$3.13m</b>.</p></div>
+    <div class="grid2">
+      <div class="panel" id="sSliders"></div>
+      <div class="panel">
+        <div class="stats" id="sStats"></div>
+        <h3 style="margin-top:14px">Break-even</h3>
+        <div class="tablewrap"><table id="sBE"></table></div>
+        <div class="row" style="margin-top:10px"><button class="btn ghost small" id="sReset" type="button">Back to the base case</button></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="row" style="align-items:center"><h3 style="margin:0">Tornado chart: NPV for a change of</h3><div class="chips" id="tChips"><button class="chip" data-v="10" aria-pressed="true">±10%</button><button class="chip" data-v="20" aria-pressed="false">±20%</button></div></div>
+      <svg class="chart" id="tChart" viewBox="0 0 640 300" role="img" aria-label="Tornado chart of NPV"></svg>
+      <div class="legend"><span><i style="background:var(--red)"></i>Downside</span><span><i style="background:var(--navy)"></i>Upside</span><span>Bars measured from the NPV at your current inputs</span></div>
+    </div>
+  </section>
+
+  <!-- 3 SCENARIOS AND SIMULATION -->
+  <section class="tab" id="sim" role="tabpanel" aria-labelledby="t-sim" hidden>
+    <div><h2>Scenarios and simulation</h2><p class="lede">The e-scooter fleet again. Edit the three scenarios to see expected NPV and its spread (slide 15), then run a Monte Carlo simulation and see how correlation changes the picture (slides 20 to 22).</p></div>
+    <div class="panel">
+      <h3>Scenarios</h3>
+      <div class="tablewrap"><table id="scIn" class="inputs"></table></div>
+      <div class="stats" id="scStats" style="margin-top:10px"></div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Simulation</h3>
+        <div class="row">
+          <div class="field"><label for="mQm">Rides: mean (million)</label><input type="number" id="mQm" value="4" step="0.1"></div>
+          <div class="field"><label for="mQs">Rides: SD</label><input type="number" id="mQs" value="0.6" step="0.1"></div>
+          <div class="field"><label for="mPm">Price: mean ($)</label><input type="number" id="mPm" value="3" step="0.05"></div>
+          <div class="field"><label for="mPs">Price: SD</label><input type="number" id="mPs" value="0.3" step="0.05"></div>
+        </div>
+        <div class="field"><label for="mRho">Correlation between rides and price: <span class="rangeval" id="mRhov"></span></label><input type="range" id="mRho" min="-0.9" max="0.9" step="0.1" value="0"></div>
+        <div class="row" style="align-items:center"><span class="note">Runs:</span><div class="chips" id="mN"><button class="chip" data-v="1000" aria-pressed="false">1,000</button><button class="chip" data-v="10000" aria-pressed="true">10,000</button></div><button class="btn small" id="mRun" type="button">Run the simulation</button></div>
+        <div class="stats" id="mStats" style="margin-top:12px"></div>
+        <p class="note" id="mNote"></p>
+      </div>
+      <div class="panel">
+        <svg class="chart" id="mChart" viewBox="0 0 560 300" role="img" aria-label="Histogram of simulated NPV"></svg>
+        <div class="legend"><span><i style="background:var(--red)"></i>NPV below zero</span><span><i style="background:var(--navy)"></i>NPV of zero or more</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 OPTION -->
+  <section class="tab" id="opt" role="tabpanel" aria-labelledby="t-opt" hidden>
+    <div><h2>Option to abandon the fleet</h2><p class="lede">After one year the company knows which scenario it is in. It can keep running the e-scooters or sell the fleet to another operator. Change the sale value and see when the option is worth having (slide 31).</p></div>
+    <div class="panel">
+      <div class="field"><label for="oSale">Sale value of the fleet at the end of year 1 ($m): <span class="rangeval" id="oSalev"></span></label><input type="range" id="oSale" min="0" max="8" step="0.25" value="4"></div>
+      <p class="note" style="margin-top:0">Book value at the end of year 1 is $4m; tax of 25% is paid on any gain over book value, or saved on a loss. Scenarios: best 5.0m rides at $3.20 (25%), base (50%), worst 2.8m rides at $2.60 (25%).</p>
+      <div class="tablewrap"><table id="oTable"></table></div>
+      <div class="stats" id="oStats" style="margin-top:12px"></div>
+    </div>
+    <div class="panel">
+      <svg class="chart" id="oChart" viewBox="0 0 560 260" role="img" aria-label="Value of the option against the sale value"></svg>
+      <p class="note">Value of the option to abandon against the sale value. Below the kink nobody sells; above it, a higher exit price protects more of the downside.</p>
+    </div>
+  </section>
+
+  <!-- 5 MINI CASE -->
+  <section class="tab" id="case" role="tabpanel" aria-labelledby="t-case" hidden>
+    <div><h2>Mini case: a vertical farm</h2><p class="lede">Work the risk analysis from start to finish. Enter your answers and check each step; once you have checked a step, you can also see its solution. Use $m, and $ thousand a tonne for prices.</p></div>
+    <div class="panel flat">
+      <h3>The analyst's file ($m, fictional)</h3>
+      <ul class="facts">
+        <li>A food company is deciding whether to build an indoor vertical farm for salad greens. It costs <b>$40m</b> now, depreciated straight line to zero over <b>4 years</b>.</li>
+        <li>Base case: <b>2,000 tonnes</b> a year sold at <b>$16,000 a tonne</b>. Variable cost <b>$6,000 a tonne</b>. Fixed cash costs <b>$6m</b> a year.</li>
+        <li>Tax <b>25%</b>. Discount rate <b>9%</b>. No working capital or salvage in the base case.</li>
+        <li>Scenarios: best (25%) 2,400 t at $17,000; base (50%); worst (25%) 1,600 t at $14,000.</li>
+        <li>Option: at the end of year 1 the farm could be sold for <b>$25m</b>. Its book value then is $30m, so the loss on sale saves tax.</li>
+        <li>Option to expand: only in the best scenario is demand strong enough to sell more salad. Then, at the end of year 1, the company can spend <b>$15m</b> to add <b>1,000 tonnes</b> a year for years 2 to 4, sold at the best-case price of $17,000 a tonne, with variable cost $6,000 a tonne and <b>$1m</b> a year of extra fixed costs. The $15m is depreciated straight line to zero over those 3 years.</li>
+      </ul>
+    </div>
+    <div class="panel"><h3>Step 1: base case</h3><div class="row" id="c1"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="1" type="button">Check step 1</button><button class="btn ghost small" data-show="1" type="button" hidden>Show the solution</button></div><p class="status" id="c1Msg"></p></div>
+    <div class="panel"><h3>Step 2: sensitivity</h3><div class="row" id="c2"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="2" type="button">Check step 2</button><button class="btn ghost small" data-show="2" type="button" hidden>Show the solution</button></div><p class="status" id="c2Msg"></p></div>
+    <div class="panel"><h3>Step 3: scenarios</h3><div class="row" id="c3"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="3" type="button">Check step 3</button><button class="btn ghost small" data-show="3" type="button" hidden>Show the solution</button></div><p class="status" id="c3Msg"></p></div>
+    <div class="panel"><h3>Step 4: the option to sell after year 1</h3><div class="row" id="c4"></div>
+      <div class="row" style="align-items:center;margin-top:4px"><span class="note">In the worst case, management should:</span><div class="chips" id="c4Dec"><button class="chip" type="button" data-v="keep" aria-pressed="false">Keep the farm</button><button class="chip" type="button" data-v="sell" aria-pressed="false">Sell it after year 1</button></div></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="4" type="button">Check step 4</button><button class="btn ghost small" data-show="4" type="button" hidden>Show the solution</button></div><p class="status" id="c4Msg"></p></div>
+    <div class="panel"><h3>Step 5: the option to expand in the best scenario</h3><div class="row" id="c5"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="5" type="button">Check step 5</button><button class="btn ghost small" data-show="5" type="button" hidden>Show the solution</button><button class="btn ghost small" id="cReset" type="button">Start again</button></div><p class="status" id="c5Msg"></p></div>
+  </section>
+
+  <p class="note" style="margin-top:28px">All projects are fictional. Slide numbers refer to the lecture deck, Project Risk. The lecture's recycling plant is modelled in Project_Risk_Lab.xlsx.</p>
+</div>
+
+<script>
+// ===== helpers =====
+const $=s=>document.querySelector(s);
+const fmt=(x,d=2)=>Number.isFinite(x)?x.toLocaleString("en-GB",{minimumFractionDigits:d,maximumFractionDigits:d}):"n/a";
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function el(tag,attrs={},text){const e=document.createElement(tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!==undefined)e.textContent=text;return e;}
+function stats(box,items){box.replaceChildren(...items.map(([k,v])=>{const d=el("div",{class:"stat"});d.append(el("div",{class:"v"},v),el("div",{class:"k"},k));return d;}));}
+function table(tb,head,rows){tb.replaceChildren();const hr=el("tr");head.forEach(h=>hr.append(el("th",{},h)));tb.append(hr);rows.forEach(r=>{const tr=el("tr");r.forEach(c=>{const td=el("td");if(c instanceof Node)td.append(c);else td.textContent=c;tr.append(td);});tb.append(tr);});}
+const NS="http://www.w3.org/2000/svg";
+function svgEl(tag,attrs){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+function svgText(svg,x,y,t,anchor="middle",extra={}){const tx=svgEl("text",Object.assign({x,y,"text-anchor":anchor},extra));tx.textContent=t;svg.append(tx);return tx;}
+function niceStep(x){const p=Math.pow(10,Math.floor(Math.log10(x)));const n=x/p;return (n<1.5?1:n<3?2:n<7?5:10)*p;}
+function range(a,b,s){const out=[];for(let v=a;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));return out;}
+function axes(svg,{xMin,xMax,yMin,yMax,xStep,yStep,xFmt,yFmt,xTitle,yTitle,m}){m=m||{l:52,r:14,t:12,b:38};const vb=svg.viewBox.baseVal,W=vb.width,H=vb.height;
+ const X=x=>m.l+(x-xMin)/(xMax-xMin)*(W-m.l-m.r),Y=y=>H-m.b-(y-yMin)/(yMax-yMin)*(H-m.t-m.b);svg.replaceChildren();
+ for(const t of range(Math.ceil(yMin/yStep)*yStep,yMax,yStep)){svg.append(svgEl("line",{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:"grid"}));svgText(svg,m.l-6,Y(t)+4,yFmt(t),"end");}
+ for(const t of range(Math.ceil(xMin/xStep)*xStep,xMax,xStep))svgText(svg,X(t),H-m.b+16,xFmt(t));
+ if(xTitle)svgText(svg,(m.l+W-m.r)/2,H-4,xTitle);if(yTitle)svgText(svg,12,(m.t+H-m.b)/2,yTitle,"middle",{transform:`rotate(-90 12 ${(m.t+H-m.b)/2})`});
+ svg.append(svgEl("line",{x1:m.l,x2:m.l,y1:m.t,y2:H-m.b,class:"grid"}));return {X,Y,W,H,m};}
+function path(svg,pts,color,width=2.5,dash=""){svg.append(svgEl("path",{d:pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" "),fill:"none",stroke:css(color),"stroke-width":width,"stroke-dasharray":dash}));}
+function dot(svg,x,y,color,r=6){svg.append(svgEl("circle",{cx:x,cy:y,r,fill:css(color),stroke:css("--surface"),"stroke-width":2}));}
+function chipGroup(sel,cb){const cs=[...document.querySelectorAll(sel+" .chip")];cs.forEach(c=>c.addEventListener("click",()=>{cs.forEach(x=>x.setAttribute("aria-pressed",x===c));cb(c);}));return ()=>cs.find(c=>c.getAttribute("aria-pressed")==="true");}
+
+const money=x=>(x<-0.005?"−$":"$")+fmt(Math.abs(x),2)+"m";
+const m1=x=>x===null||x===undefined?"":(Math.abs(x)<0.005?"0.0":(x<0?"("+fmt(-x,1)+")":fmt(x,1)));
+const sg2=x=>(x<0?"−":"")+fmt(Math.abs(x),2);
+const ann=(r,n)=>(1-Math.pow(1+r,-n))/r;
+function irrF(cf){const f=r=>cf.reduce((a,c,t)=>a+c/Math.pow(1+r,t),0);let lo=-0.99,hi=10,flo=f(lo);if(flo*f(hi)>0)return NaN;for(let i=0;i<200;i++){const m=(lo+hi)/2,fm=f(m);if(flo*fm<=0)hi=m;else{lo=m;flo=fm;}}return (lo+hi)/2;}
+const BASE={P:3.0,Q:4.0,v:1.4,F:2.0,K:6.0,r:0.12,t:0.25,N:3};
+const ocfF=p=>(p.Q*(p.P-p.v)-p.F-p.K/p.N)*(1-p.t)+p.K/p.N;
+const npvF=p=>ocfF(p)*ann(p.r,p.N)-p.K;
+
+// ===== 1 quiz =====
+const QUIZ=[
+ {q:"A product sells for $50 a unit with a variable cost of $30. Fixed cash costs are $12m a year and depreciation $8m. The accounting break-even volume is:",o:["0.6m units","1.0m units","0.4m units","1.6m units"],a:1,e:"(12 + 8) / (50 − 30) = 1.0m units: EBIT is zero (slide 11)."},
+ {q:"Same product: $50 price, $30 variable cost, $12m fixed cash costs, $8m depreciation. The cash break-even volume is:",o:["0.6m units","1.0m units","0.4m units","1.6m units"],a:0,e:"12 / 20 = 0.6m units: EBITDA is zero. It ignores the cost of the investment (slide 11)."},
+ {q:"Which break-even point tells you whether a project earns its cost of capital?",o:["Cash break-even: EBITDA = 0","Accounting break-even: EBIT = 0","NPV break-even: NPV = 0","Payback break-even: cumulative cash flow = 0"],a:2,e:"Only the NPV break-even also covers the return investors require. A project can show an accounting profit and still have a negative NPV (slide 11)."},
+ {q:"A 10% fall in price cuts a project's NPV by $30m, a 10% fall in volume by $12m, and a 10% rise in fixed costs by $3m. What does this sensitivity analysis NOT tell you?",o:["Which input matters most","How likely a 10% fall in price is","That price is the steepest line","That fixed costs matter least"],a:1,e:"Sensitivity ranks inputs but says nothing about probabilities or how inputs move together (slide 12)."},
+ {q:"Scenarios: 30% chance of NPV $50m, 50% chance of $10m, 20% chance of −$40m. The expected NPV is:",o:["$12.0m","$6.7m","$20.0m","$10.0m"],a:0,e:"0.3 × 50 + 0.5 × 10 + 0.2 × (−40) = 15 + 5 − 8 = $12.0m (slide 15)."},
+ {q:"Same scenarios (expected NPV $12m). The standard deviation is $31.2m. The coefficient of variation is:",o:["2.60","0.38","31.2","1.00"],a:0,e:"31.2 / 12.0 = 2.60: far riskier than a typical project with a CV of 0.2 to 0.4 (slides 15 and 25)."},
+ {q:"A simulation of 10,000 runs gives a mean NPV of $15m and 2,600 runs below zero. Which statement is right?",o:["The project must be rejected because it can lose money","There is about a 26% chance of a negative NPV, but simulation alone does not say whether that risk is acceptable","The NPV is certain to be $15m","Correlation between inputs cannot change the answer"],a:1,e:"Simulation gives a distribution, not a decision rule; and it measures stand-alone risk (slide 23)."},
+ {q:"A project costs $60m and returns $20m a year for 4 years. NPV is $3.4m at the 10% WACC. The project is riskier than average, so a 13% rate is applied. NPV becomes:",o:["$3.4m","−$0.5m","$1.5m","−$3.4m"],a:1,e:"In Excel: =NPV(13%, 20, 20, 20, 20) − 60 = −$0.5m. The risk premium turns a marginal project down (slide 26)."},
+ {q:"After a poor first year, the PV of a plant's remaining cash flows is $18m. It can be sold for $22m after tax. Management should:",o:["Keep it: selling locks in the loss","Sell it: the option to abandon is worth $4m in this state","Keep it, because sunk costs must be recovered","Sell it only if the sale price exceeds the original cost"],a:1,e:"Compare the value of continuing ($18m) with the exit value ($22m). The past cost is sunk (slides 28 and 31)."},
+ {q:"A biotech company can build a $200m plant now, or wait a year for its Phase III results and then decide. Waiting costs a year of profits if the drug succeeds. In real-options terms, waiting is:",o:["An option to abandon","An option to delay: worth it if learning the trial result is worth more than a year of lost cash flow","A sunk cost","A reason to raise the discount rate"],a:1,e:"The option to delay has value when uncertainty will be resolved soon and investing is hard to reverse (slides 28 to 30)."}];
+let quizAns={};
+function renderQuiz(){const box=$("#quizbox");box.replaceChildren();
+ QUIZ.forEach((it,qi)=>{const q=el("div",{class:"q"});q.append(el("p",{},(qi+1)+". "+it.q));const opts=el("div",{class:"opts",role:"radiogroup"});
+  it.o.forEach((o,oi)=>{const lab=el("label",{class:"opt"});const inp=el("input",{type:"radio",name:"q"+qi,id:`q${qi}o${oi}`});lab.setAttribute("for",`q${qi}o${oi}`);
+   if(quizAns[qi]!==undefined){inp.disabled=true;if(oi===it.a)lab.classList.add("right");if(oi===quizAns[qi]&&oi!==it.a)lab.classList.add("wrong");if(oi===quizAns[qi])inp.checked=true;}
+   inp.addEventListener("change",()=>{quizAns[qi]=oi;renderQuiz();});lab.append(inp,el("span",{},o));opts.append(lab);});
+  q.append(opts);if(quizAns[qi]!==undefined){const ok=quizAns[qi]===it.a;q.append(el("div",{class:"fb "+(ok?"ok":"no")},(ok?"Correct. ":"Not quite. ")+it.e));}
+  box.append(q);});
+ const score=Object.entries(quizAns).filter(([qi,a])=>QUIZ[qi].a===a).length;$("#quizscore").textContent=`Score: ${score} / ${QUIZ.length}`;}
+$("#quizReset").addEventListener("click",()=>{quizAns={};renderQuiz();});
+
+// ===== 2 sensitivity =====
+const SIN=[["P","Price per ride ($)",2,4,0.05,2],["Q","Rides a year (million)",2.5,5.5,0.05,2],["v","Variable cost per ride ($)",0.8,2,0.05,2],["F","Fixed cash costs ($m a year)",1,3.5,0.05,2],["K","Fleet and depot cost ($m)",4,9,0.1,1],["r","Discount rate (%)",8,18,0.25,2]];
+let SP={...BASE};
+function buildSliders(){const box=$("#sSliders");box.replaceChildren(el("h3",{},"Inputs"));SIN.forEach(([k,lab,mn,mx,st,dp])=>{const f=el("div",{class:"field"});const val=k==="r"?SP.r*100:SP[k];
+ const l=el("label",{for:"si_"+k});l.append(lab+": ",el("span",{class:"rangeval",id:"sv_"+k},fmt(val,dp)));const i=el("input",{type:"range",id:"si_"+k,min:mn,max:mx,step:st,value:val});
+ i.addEventListener("input",()=>{SP[k]=k==="r"?(+i.value)/100:+i.value;$("#sv_"+k).textContent=fmt(+i.value,dp);drawSens();});f.append(l,i);box.append(f);});}
+let tDev=10;
+function drawSens(){const o=ocfF(SP),n=npvF(SP),irr=irrF([-SP.K,...Array(SP.N).fill(o)]);
+ stats($("#sStats"),[["NPV",money(n)],["IRR",fmt(irr*100,1)+"%"],["Operating cash flow a year",money(o)],["Change from the base case",money(n-npvF(BASE))]]);
+ const D=SP.K/SP.N,m=SP.P-SP.v,need=SP.K/ann(SP.r,SP.N),qbe=((need-D)/(1-SP.t)+SP.F+D)/m,pbe=SP.v+((need-D)/(1-SP.t)+SP.F+D)/SP.Q;
+ table($("#sBE"),["Measure","Value"],[["Cash break-even rides",fmt(SP.F/m,2)+" million"],["Accounting break-even rides",fmt((SP.F+D)/m,2)+" million"],["NPV break-even rides",fmt(qbe,2)+" million"],["Margin of safety on rides",fmt((1-qbe/SP.Q)*100,1)+"%"],["NPV break-even price","$"+fmt(pbe,2)+" a ride"],["Margin of safety on price",fmt((1-pbe/SP.P)*100,1)+"%"]]);
+ const d=tDev/100;const bars=SIN.map(([k,lab])=>{const lo=npvF({...SP,[k]:SP[k]*(1-d)})-n,hi=npvF({...SP,[k]:SP[k]*(1+d)})-n;return {lab:lab.replace(/ \(.*\)/,""),a:Math.min(lo,hi),b:Math.max(lo,hi)};}).sort((x,y)=>(y.b-y.a)-(x.b-x.a));
+ const svg=$("#tChart");svg.replaceChildren();const W=640,H=300,l=170,r=20,t=10,bh=(H-40-t)/bars.length;const mx=Math.max(0.5,...bars.map(b=>Math.max(-b.a,b.b)));const step=niceStep(mx/3),lim=Math.ceil(mx/step)*step;
+ const X=x=>l+(x+lim)/(2*lim)*(W-l-r);
+ for(let v=-lim;v<=lim+1e-9;v+=step){svg.append(svgEl("line",{x1:X(v),x2:X(v),y1:t,y2:H-30,class:"grid"}));svgText(svg,X(v),H-12,(v<0?"−":"")+fmt(Math.abs(v),step<1?1:0));}
+ bars.forEach((b,i)=>{const y=t+i*bh+bh*0.18,h=bh*0.64;svg.append(svgEl("rect",{x:X(b.a),y,width:X(0)-X(b.a),height:h,fill:css("--red")}));svg.append(svgEl("rect",{x:X(0),y,width:X(b.b)-X(0),height:h,fill:css("--navy")}));svgText(svg,l-8,y+h/2+4,b.lab,"end");});
+ svg.append(svgEl("line",{x1:X(0),x2:X(0),y1:t,y2:H-30,stroke:css("--ink"),"stroke-width":1}));}
+chipGroup("#tChips",c=>{tDev=+c.dataset.v;drawSens();});
+$("#sReset").addEventListener("click",()=>{SP={...BASE};buildSliders();drawSens();});
+
+// ===== 3 scenarios and simulation =====
+let SC=[["Best: strong demand",25,5.0,3.2],["Base",50,4.0,3.0],["Worst: city caps fleets, rival enters",25,2.8,2.6]];
+function buildScIn(){const tb=$("#scIn");tb.replaceChildren();const hr=el("tr");["Scenario","Probability (%)","Rides (million)","Price per ride ($)","NPV ($m)"].forEach(h=>hr.append(el("th",{},h)));tb.append(hr);
+ SC.forEach((s,i)=>{const tr=el("tr");tr.append(el("td",{},s[0]));[1,2,3].forEach(j=>{const td=el("td");const inp=el("input",{type:"number",id:`sc_${i}_${j}`,step:j===1?"1":"0.1",value:s[j]});inp.addEventListener("input",()=>{SC[i][j]=+inp.value;drawSc();});td.append(inp);tr.append(td);});tr.append(el("td",{id:"scn_"+i},""));tb.append(tr);});}
+function drawSc(){const v=SC.map(s=>npvF({...BASE,Q:s[2],P:s[3]})),p=SC.map(s=>s[1]/100),ps=p.reduce((a,b)=>a+b,0);
+ v.forEach((x,i)=>{$("#scn_"+i).textContent=m1(x);});const e=v.reduce((a,x,i)=>a+p[i]*x,0),sd=Math.sqrt(v.reduce((a,x,i)=>a+p[i]*(x-e)**2,0));
+ stats($("#scStats"),[["Probabilities add to",fmt(ps*100,0)+"%"],["Expected NPV",money(e)],["Standard deviation",money(sd)],["Coefficient of variation",Math.abs(e)>0.05?fmt(sd/e,2):"n/a"],["Probability NPV < 0",fmt(v.reduce((a,x,i)=>a+(x<0?p[i]:0),0)*100,0)+"%"]]);}
+let simN=10000,lastSim=null;chipGroup("#mN",c=>{simN=+c.dataset.v;});
+$("#mRho").addEventListener("input",()=>{$("#mRhov").textContent=fmt(+$("#mRho").value,1);});
+function gauss(){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function runSim(){const qm=+$("#mQm").value,qs=+$("#mQs").value,pm=+$("#mPm").value,ps=+$("#mPs").value,rho=+$("#mRho").value;const out=new Float64Array(simN);
+ for(let i=0;i<simN;i++){const z1=gauss(),z2=gauss();const Q=qm+qs*z1,P=pm+ps*(rho*z1+Math.sqrt(1-rho*rho)*z2);out[i]=npvF({...BASE,Q,P});}
+ const s=Array.from(out).sort((a,b)=>a-b),mean=s.reduce((a,b)=>a+b,0)/simN,sd=Math.sqrt(s.reduce((a,b)=>a+(b-mean)**2,0)/(simN-1)),pct=q=>s[Math.min(simN-1,Math.floor(q*simN))],neg=s.filter(x=>x<0).length;
+ lastSim={s,mean,sd,neg,rho};
+ stats($("#mStats"),[["Mean NPV",money(mean)],["Standard deviation",money(sd)],["5th percentile",money(pct(0.05))],["95th percentile",money(pct(0.95))],["Probability NPV < 0",fmt(neg/simN*100,1)+"%"]]);
+ $("#mNote").textContent=`${fmt(simN,0)} runs, correlation ${fmt(rho,1)}. Try a correlation of 0.5: if rides and prices fall together, the spread widens. Each run uses fresh random numbers, so results move a little.`;
+ drawHist();}
+function drawHist(){const svg=$("#mChart");if(!lastSim){svg.replaceChildren();return;}const {s}=lastSim;const lo=-8,hi=14,bw=1,nb=(hi-lo)/bw,c=new Array(nb).fill(0);
+ s.forEach(x=>{let k=Math.floor((x-lo)/bw);k=Math.max(0,Math.min(nb-1,k));c[k]++;});const ymax=Math.max(...c);const step=niceStep(ymax/4);
+ const {X,Y}=axes(svg,{xMin:lo,xMax:hi,yMin:0,yMax:Math.ceil(ymax/step)*step,xStep:2,yStep:step,xFmt:x=>(x<0?"−":"")+fmt(Math.abs(x),0),yFmt:y=>fmt(y,0),xTitle:"NPV ($m)",m:{l:52,r:14,t:12,b:38}});
+ c.forEach((n,k)=>{const x0=lo+k*bw;svg.append(svgEl("rect",{x:X(x0)+1,y:Y(n),width:X(x0+bw)-X(x0)-2,height:Y(0)-Y(n),fill:css(x0<0?"--red":"--navy")}));});
+ svg.append(svgEl("line",{x1:X(0),x2:X(0),y1:Y(0),y2:12,stroke:css("--ink"),"stroke-width":1,"stroke-dasharray":"4 4"}));}
+$("#mRun").addEventListener("click",runSim);
+
+// ===== 4 option =====
+const OPT_SC=[["Best",0.25,5.0,3.2],["Base",0.5,4.0,3.0],["Worst",0.25,2.8,2.6]];
+function optCalc(sale){const book=4,at=sale-0.25*(sale-book),a2=ann(0.12,2);let e0=0,e1=0;const rows=OPT_SC.map(([n,p,Q,P])=>{const o=ocfF({...BASE,Q,P}),keep=o*a2,sell=at>keep,v0=npvF({...BASE,Q,P}),v1=sell?(o+at)/1.12-6:v0;e0+=p*v0;e1+=p*v1;return [n,fmt(p*100,0)+"%",fmt(o,2),fmt(keep,2),fmt(at,2),sell?"Sell":"Keep",fmt2(v0),fmt2(v1)];});return {rows,e0,e1,at};}
+const fmt2=x=>Math.abs(x)<0.005?"0.00":(x<0?"("+fmt(-x,2)+")":fmt(x,2));
+function drawOpt(){const sale=+$("#oSale").value;$("#oSalev").textContent="$"+fmt(sale,2)+"m";const R=optCalc(sale);
+ table($("#oTable"),["Scenario","Probability","Cash flow a year","PV of years 2–3 if kept","After-tax sale value","Decision","NPV without option","NPV with option"],R.rows);
+ stats($("#oStats"),[["Expected NPV without the option",money(R.e0)],["Expected NPV with the option",money(R.e1)],["Value of the option to abandon",money(R.e1-R.e0)]]);
+ const svg=$("#oChart");const xs=range(0,8,0.05),pts=xs.map(x=>[x,optCalc(x).e1-optCalc(x).e0]);const ym=Math.max(...pts.map(p=>p[1]),0.5);const st=niceStep(ym/4);
+ const {X,Y}=axes(svg,{xMin:0,xMax:8,yMin:0,yMax:Math.ceil(ym/st)*st,xStep:1,yStep:st,xFmt:x=>"$"+x+"m",yFmt:y=>"$"+fmt(y,2)+"m",xTitle:"Sale value of the fleet at the end of year 1",m:{l:56,r:14,t:12,b:38}});
+ path(svg,pts.map(p=>[X(p[0]),Y(p[1])]),"--navy",3);dot(svg,X(sale),Y(R.e1-R.e0),"--amber",6);}
+$("#oSale").addEventListener("input",drawOpt);
+
+// ===== 5 mini case =====
+const VF={K:40,N:4,Q:2,P:16,v:6,F:6,t:0.25,r:0.09};
+const vfo=p=>(p.Q*(p.P-p.v)-p.F-p.K/p.N)*(1-p.t)+p.K/p.N, vfn=p=>vfo(p)*ann(p.r,p.N)-p.K;
+function vfSolve(){const o=vfo(VF),n=vfn(VF),need=VF.K/ann(VF.r,VF.N),D=VF.K/VF.N,pbe=VF.v+((need-D)/(1-VF.t)+VF.F+D)/VF.Q;
+ const sc=[[0.25,2.4,17],[0.5,2,16],[0.25,1.6,14]].map(([p,Q,P])=>({p,n:vfn({...VF,Q,P}),o:vfo({...VF,Q,P})}));const e=sc.reduce((a,s)=>a+s.p*s.n,0),sd=Math.sqrt(sc.reduce((a,s)=>a+s.p*(s.n-e)**2,0));
+ const ow=sc[2].o,keep=ow*ann(VF.r,3),sale=25+0.25*(30-25),wab=(ow+sale)/(1+VF.r)-VF.K,eopt=sc[0].p*sc[0].n+sc[1].p*sc[1].n+sc[2].p*Math.max(wab,sc[2].n);
+ const xo=(1*(17-VF.v)-1-15/3)*(1-VF.t)+15/3,xpv=xo*ann(VF.r,3),xn1=xpv-15,xopt=0.25*Math.max(xn1,0)/(1+VF.r);
+ return {xo,xpv,xn1,xopt,xe:e+xopt,ebit:VF.Q*(VF.P-VF.v)-VF.F-D,o,n,irr:irrF([-VF.K,...Array(VF.N).fill(o)])*100,np10:vfn({...VF,P:VF.P*0.9}),nq10:vfn({...VF,Q:VF.Q*0.9}),pbe,need,e,sd,cv:sd/e,keep,sale,wab,optv:eopt-e};}
+const CS={1:[["c1a","EBIT a year ($m)","ebit",0.051],["c1b","Operating cash flow a year ($m)","o",0.051],["c1c","NPV ($m)","n",0.06],["c1d","IRR (%)","irr",0.15]],
+ 2:[["c2a","NPV if price is 10% lower ($m)","np10",0.06],["c2b","NPV if volume is 10% lower ($m)","nq10",0.06]],
+ 3:[["c3a","Expected NPV ($m)","e",0.06],["c3b","Standard deviation ($m)","sd",0.06],["c3c","Coefficient of variation","cv",0.03]],
+ 4:[["c4a","Worst case: PV of years 2–4 at year 1 ($m)","keep",0.06],["c4b","After-tax sale value ($m)","sale",0.06],["c4c","Worst-case NPV if sold ($m)","wab",0.06],["c4d","Value of the option ($m)","optv",0.06]],
+ 5:[["c5a","Extra cash flow a year, years 2–4 ($m)","xo",0.051],["c5b","NPV of the expansion at the end of year 1 ($m)","xn1",0.06],["c5c","Value of the option to expand today ($m)","xopt",0.06],["c5d","Expected NPV with the option to expand ($m)","xe",0.06]]};
+function buildCase(){Object.entries(CS).forEach(([st,arr])=>{const box=$("#c"+st);box.replaceChildren(...arr.map(([id,lab])=>{const f=el("div",{class:"field"});const i=el("input",{type:"number",id,step:"0.01"});i.addEventListener("input",()=>{i.style.borderColor="";$("#c"+st+"Msg").textContent="";});f.append(el("label",{for:id},lab),i);return f;}));});}
+let c4Dec=null;chipGroup("#c4Dec",c=>{c4Dec=c.dataset.v;});
+const HINT={1:"EBIT = 2 × (16 − 6) − 6 − 10; then NOPAT + depreciation. NPV in Excel: =NPV(9%, cash flows for years 1 to 4) − 40.",2:"Change one input and keep the rest at the base case. Price 14.4: EBIT = 2 × (14.4 − 6) − 6 − 10. Volume 1,800 t: EBIT = 1.8 × (16 − 6) − 6 − 10. Then cash flow and NPV as in step 1.",3:"Build each scenario's cash flow and NPV, then weight by 25%, 50%, 25%.",4:"PV of continuing at the end of year 1: =NPV(9%, 7.6, 7.6, 7.6). Compare it with the after-tax sale value: 25 + 0.25 × (30 − 25).",5:"Extra EBIT = 1 × (17 − 6) − 1 − 5. At the end of year 1: =NPV(9%, cash flow, cash flow, cash flow) − 15. Bring it back one year (÷ 1.09) and weight it by the 25% chance of the best scenario."};
+function checkStep(st,show){const S=vfSolve();let ok=0,tried=0;CS[st].forEach(([id,,key,tol])=>{const i=$("#"+id);if(show)i.value=(Math.round(S[key]*100)/100).toString();if(i.value==="")return;tried++;const g=Math.abs(parseFloat(i.value)-S[key])<=tol;i.style.borderColor=css(g?"--ok":"--bad");if(g)ok++;});
+ if(!show&&tried>0){const sb=document.querySelector(`[data-show="${st}"]`);if(sb)sb.hidden=false;}
+ let msg=tried===0?"Enter at least one answer first.":`${ok} of ${tried} right.`+(ok<tried?" Hint: "+HINT[st]:"");
+ if(st==4){const right=S.keep<S.sale?"sell":"keep";if(show){c4Dec=right;document.querySelectorAll("#c4Dec .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v===right));}if(c4Dec)msg+=c4Dec===right?" Decision right: selling ($26.25m) beats continuing ($19.24m).":" Check the decision: compare continuing with the after-tax sale value.";}
+ if(show){const sol={1:`EBIT ${fmt(S.ebit,2)}; cash flow ${fmt(S.o,2)}; NPV ${sg2(S.n)}; IRR ${fmt(S.irr,1)}%. Accept on the base case, just.`,2:`Price 10% lower: NPV ${sg2(S.np10)}. Volume 10% lower: NPV ${sg2(S.nq10)}. A 10% fall in either turns the NPV negative; price matters more, because a lower price cuts revenue without saving any variable cost.`,3:`Expected NPV ${sg2(S.e)}; SD ${fmt(S.sd,2)}; CV ${fmt(S.cv,2)}: very high stand-alone risk.`,4:`Continue ${fmt(S.keep,2)} < sell ${fmt(S.sale,2)}, so sell. Worst-case NPV rises from −15.38 to ${sg2(S.wab)}; the option adds ${fmt(S.optv,2)} to the expected NPV.`,5:`Extra EBIT 5.00, so cash flow 5 × 0.75 + 5 = ${fmt(S.xo,2)} a year. PV at the end of year 1 ${fmt(S.xpv,2)}, less 15 = ${fmt(S.xn1,2)}. Today: ${fmt(S.xn1,2)} / 1.09 × 25% = ${fmt(S.xopt,2)}. Expected NPV rises from ${fmt(S.e,2)} to ${fmt(S.xe,2)}. The company only expands if things go well, so the option adds value without adding downside.`}[st];msg="Solution: "+sol;}
+ $("#c"+st+"Msg").textContent=msg;}
+document.querySelectorAll("[data-step]").forEach(b=>b.addEventListener("click",()=>checkStep(+b.dataset.step,false)));
+document.querySelectorAll("[data-show]").forEach(b=>b.addEventListener("click",()=>checkStep(+b.dataset.show,true)));
+$("#cReset").addEventListener("click",()=>{buildCase();c4Dec=null;document.querySelectorAll("#c4Dec .chip").forEach(c=>c.setAttribute("aria-pressed","false"));[1,2,3,4,5].forEach(s=>$("#c"+s+"Msg").textContent="");document.querySelectorAll("[data-show]").forEach(b=>b.hidden=true);});
+
+// ===== tabs and boot =====
+const tabs=[...document.querySelectorAll('nav.tabs button')];
+function showTab(id){tabs.forEach(b=>{const on=b.getAttribute("aria-controls")===id;b.setAttribute("aria-selected",on);document.getElementById(b.getAttribute("aria-controls")).hidden=!on;});try{localStorage.setItem("risk-tab",id);}catch(e){}drawAll();}
+tabs.forEach(b=>b.addEventListener("click",()=>showTab(b.getAttribute("aria-controls"))));
+function drawAll(){drawSens();drawSc();drawHist();drawOpt();}
+renderQuiz();buildSliders();buildScIn();buildCase();$("#mRhov").textContent="0.0";runSim();
+try{const t=localStorage.getItem("risk-tab");if(t&&document.getElementById(t))showTab(t);else drawAll();}catch(e){drawAll();}
+const mq=window.matchMedia("(prefers-color-scheme: dark)");mq.addEventListener&&mq.addEventListener("change",drawAll);
+new MutationObserver(drawAll).observe(document.documentElement,{attributes:true,attributeFilter:["data-theme"]});
+</script>
+
+</body></html>
