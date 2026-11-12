@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Capital Structure</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky tab bar over a single 1100px column; each tab is a workbench of panels (controls left, readout right) */
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#16202C; --muted:#5B6B82; --line:#D9E0E8;
+  --navy:#0E1A2B; --teal:#0E8A96; --amber:#C98A22; --red:#C2453B; --slate:#5B6B82; --tint:#E8F3F4;
+  --ok:#1E7F4F; --bad:#B23A30;
+  --f-display:"Newsreader", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C141F; --surface:#131E2C; --ink:#E6ECF2; --muted:#9AA9BC; --line:#26354A;
+  --navy:#E6ECF2; --teal:#4FC3CC; --amber:#E8B04F; --red:#EE7A6E; --slate:#9AA9BC; --tint:#14303A;
+  --ok:#5FD39A; --bad:#F08A80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C141F; --surface:#131E2C; --ink:#E6ECF2; --muted:#9AA9BC; --line:#26354A;
+  --navy:#E6ECF2; --teal:#4FC3CC; --amber:#E8B04F; --red:#EE7A6E; --slate:#9AA9BC; --tint:#14303A;
+  --ok:#5FD39A; --bad:#F08A80; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+.kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+.sub{color:var(--muted);margin:4px 0 0;max-width:62ch}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin:0 -16px 20px;padding:8px 16px 0}
+nav.tabs button{font:inherit;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px 10px;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--teal)}
+nav.tabs button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.tabnum{font-family:var(--f-mono);font-size:12px;color:var(--teal);margin-right:6px}
+section.tab{display:grid;gap:18px}
+h2{font-family:var(--f-display);font-size:26px;font-weight:700;margin:0;text-wrap:balance}
+h3{font-size:16px;font-weight:600;margin:0 0 8px}
+.lede{color:var(--muted);margin:2px 0 0;max-width:70ch}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:820px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.panel.flat{background:var(--tint);border-color:transparent}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field{display:grid;gap:4px;margin-bottom:12px}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.row>.field{flex:1 1 120px}
+input[type=number],input[type=text],select,textarea{font:inherit;font-family:var(--f-mono);font-size:14px;width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+textarea{font-family:var(--f-body);resize:vertical;min-height:60px}
+input[type=range]{width:100%;accent-color:var(--teal)}
+.rangeval{font-family:var(--f-mono);font-size:14px;color:var(--ink)}
+button.btn{font:inherit;font-weight:500;padding:8px 14px;border-radius:6px;border:1px solid var(--teal);background:var(--teal);color:var(--surface);cursor:pointer}
+button.btn.ghost{background:transparent;color:var(--teal)}
+button.btn.small{padding:4px 10px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:var(--surface)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--tint);border-radius:8px;padding:10px 12px}
+.stat .v{font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.stat .k{font-size:12px;color:var(--muted)}
+.rating{display:inline-block;font-family:var(--f-mono);font-weight:500;padding:2px 8px;border-radius:4px;color:#fff}
+.rating.ig{background:#1E7F4F}.rating.bbb{background:#B07A12}.rating.hy{background:#B23A30}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.tablewrap{overflow-x:auto}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--f-body);font-size:11px}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.note{font-size:13px;color:var(--muted)}
+.q{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.q:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.q p{margin:0 0 8px;font-weight:500}
+.opts{display:grid;gap:6px}
+.opt{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:6px;cursor:pointer;background:var(--surface)}
+.opt input{margin-top:4px}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--surface))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
+.fb{font-size:14px;margin-top:6px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.ans{display:grid;grid-template-columns:minmax(0,1fr) 120px auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.ans:last-child{border-bottom:0}
+.ans .mark{font-size:13px;min-width:70px}
+.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+.given{font-family:var(--f-mono);font-size:13px;background:var(--tint);border-radius:6px;padding:8px 10px;margin:6px 0 10px;line-height:1.7}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.role{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface)}
+.role h4{margin:0 0 6px;font-size:15px}
+.role p{margin:0 0 6px;font-size:13.5px}
+.role ul{margin:0;padding-left:18px;font-size:13.5px}
+.bar{height:26px;border-radius:4px;background:var(--teal);min-width:2px;transition:width .3s}
+.barrow{display:grid;grid-template-columns:150px minmax(0,1fr) 44px;gap:10px;align-items:center;margin-bottom:8px;font-size:14px}
+.barrow .n{font-family:var(--f-mono);text-align:right}
+.reasons{display:grid;gap:6px;max-height:260px;overflow:auto;margin-top:10px}
+.reasons div{font-size:13.5px;background:var(--tint);border-radius:6px;padding:6px 10px}
+.status{font-size:13px;color:var(--muted)}
+details summary{cursor:pointer;color:var(--teal);font-weight:500}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:520px){.ans{grid-template-columns:minmax(0,1fr) 100px}.ans .mark{grid-column:1/-1}.barrow{grid-template-columns:110px minmax(0,1fr) 36px}}
+
+.sortkey{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13px}
+.keyitem b{font-weight:600}.keyitem span{color:var(--muted)}
+.sortgrid,.predgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.sortcard,.predcard{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;display:grid;gap:10px;align-content:start;min-width:0}
+.sortcard .st,.predcard .st{margin:0;font-weight:500}
+.sortcard.done-ok{border-color:var(--ok)}.sortcard.done-no{border-color:var(--bad)}
+.chip.good{background:var(--ok);border-color:var(--ok);color:var(--surface)}
+.chip.badc{background:var(--bad);border-color:var(--bad);color:var(--surface)}
+.chip:disabled{cursor:default;opacity:1}
+.predcard.revealed{background:var(--tint);border-color:transparent}
+.reveal{font-family:var(--f-mono);font-size:15px;color:var(--teal);font-weight:500}
+.predcard .btn{justify-self:start}
+table.inputs td input,table.inputs th input{min-width:90px}
+table.inputs th input{font-weight:600}
+@media (max-width:520px){.sortgrid,.predgrid{grid-template-columns:minmax(0,1fr)}}
+tr.total td{font-weight:600;background:var(--tint)}
+tr.sub td{font-weight:600}
+#bTable td:first-child,#sFixed td:first-child,#wTable td:first-child{white-space:nowrap}
+table.spot tr.pick{cursor:pointer}
+table.spot tr.pick:hover td{background:color-mix(in srgb,var(--amber) 8%,var(--surface))}
+table.spot tr.pick[aria-pressed="true"] td{background:color-mix(in srgb,var(--amber) 22%,var(--surface))}
+table.spot tr.pick:focus-visible{outline:2px solid var(--teal);outline-offset:-2px}
+table.spot td.mk{font-size:12px;color:var(--amber);font-weight:600;white-space:nowrap}
+table.spot tr.pick.hit td{background:color-mix(in srgb,var(--ok) 14%,var(--surface))}
+table.spot tr.hit td.mk{color:var(--ok)}
+table.spot tr.pick.miss td{background:color-mix(in srgb,var(--bad) 14%,var(--surface))}
+table.spot tr.miss td.mk,table.spot tr.false td.mk{color:var(--bad)}
+table.spot tr.pick.false td{background:color-mix(in srgb,var(--bad) 8%,var(--surface))}
+table.spot tr.why td{text-align:left;font-size:13.5px;color:var(--ink);background:var(--bg);white-space:normal;padding:6px 10px 10px 18px}
+#wTry .field,#bTry .field{flex:1 1 90px;margin-bottom:6px}
+table.spot tr.pick.okrow td{background:var(--surface)}
+.facts{margin:6px 0 0;padding-left:20px;display:grid;gap:6px;max-width:80ch}
+#mcTable input{min-width:78px}
+#mcRules .field{flex:1 1 150px}
+
+#sSliders .field{margin-bottom:14px}
+#scIn input{min-width:90px}
+#c1 .field,#c2 .field,#c3 .field,#c4 .field,#c5 .field{flex:1 1 200px}
+</style>
+<style>
+#lSliders .field{margin-bottom:14px}
+#c1 .field,#c2 .field,#c3 .field{flex:1 1 170px}
+.sortcard .note{font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="kicker">FIN7F2 Corporate Finance · Lecture: Capital Structure</p>
+      <h1>Capital Structure</h1>
+      <p class="sub">Three activities on capital structure choices and the optimal mix, with new cases and numbers. All companies here are fictional.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Activities">
+    <button role="tab" id="t-quiz" aria-controls="quiz" aria-selected="true"><span class="tabnum">1</span>Quiz</button>
+    <button role="tab" id="t-sort" aria-controls="sort" aria-selected="false"><span class="tabnum">2</span>Debt or equity?</button>
+    <button role="tab" id="t-case" aria-controls="case" aria-selected="false"><span class="tabnum">3</span>Mini case</button>
+  </nav>
+
+  <!-- 1 QUIZ -->
+  <section class="tab" id="quiz" role="tabpanel" aria-labelledby="t-quiz">
+    <div><h2>Quiz</h2><p class="lede">Ten mini exercises, each with its own numbers. Each answer locks once chosen and shows the working and the slide to revisit.</p></div>
+    <div class="panel"><div id="quizbox"></div><p class="status" id="quizscore" style="margin-top:12px"></p><button class="btn ghost small" id="quizReset">Start again</button></div>
+  </section>
+
+  <!-- 2 SORT -->
+  <section class="tab" id="sort" role="tabpanel" aria-labelledby="t-sort" hidden>
+    <div><h2>Debt or equity? Place each instrument on the continuum</h2><p class="lede">Harbourline Shipping plc lists eight sources of finance in its annual report. Decide where each sits, then check (slides 9 and 10). Ask: is the claim fixed, is it tax-deductible, does it rank ahead of shareholders, does it have a maturity?</p></div>
+    <div class="sortkey"><span class="keyitem"><b>Debt</b> <span>fixed, deductible, ranks ahead</span></span><span class="keyitem"><b>Hybrid</b> <span>some features of each</span></span><span class="keyitem"><b>Equity</b> <span>residual claim</span></span></div>
+    <div class="sortgrid" id="sGrid"></div>
+    <div class="row"><button class="btn small" id="sCheck" type="button">Check my answers</button><button class="btn ghost small" id="sReset" type="button">Start again</button></div>
+    <p class="status" id="sMsg"></p>
+  </section>
+
+  <!-- 3 MINI CASE -->
+  <section class="tab" id="case" role="tabpanel" aria-labelledby="t-case" hidden>
+    <div><h2>Mini case: Kestrel Retail plc</h2><p class="lede">Work Parts I and II of the assignment on one company. Enter your answers and check each step; once you have checked a step, you can also see its solution. Use £m and give percentages to two decimal places.</p></div>
+    <div class="panel flat">
+      <h3>The analyst's file (£m, fictional)</h3>
+      <ul class="facts">
+        <li>Debt: a <b>£1,200m</b> 4.5% fixed-rate sterling bond due 2030; a <b>£300m</b> floating-rate bank loan (SONIA + 1.5%) due 2028; lease liabilities of <b>£900m</b>. Total debt <b>£2,400m</b>. Cash <b>£300m</b>.</li>
+        <li>Equity: <b>400m</b> shares at <b>£14.00</b>.</li>
+        <li>Last year: EBIT <b>£400m</b>, EBITDA <b>£600m</b>, interest expense <b>£100m</b>. Marginal tax rate <b>25%</b>.</li>
+        <li>Risk-free rate <b>4.5%</b>; equity risk premium <b>5%</b>; sector unlevered beta <b>0.70</b>.</li>
+        <li>Use the Damodaran coverage table from the lecture (slide 18; slide 19 for smaller firms). Hold debt + equity (£8,000m) and EBIT constant across debt ratios. Start the rating rounds with today's synthetic rating.</li>
+        <li>Sector average debt / (debt + equity): <b>22%</b>; market average: <b>21%</b>.</li>
+      </ul>
+    </div>
+    <div class="panel"><h3>Step 1: the benefit and the risk of today's debt (Part I)</h3><div class="row" id="c1"></div>
+      <div class="row" style="align-items:center;margin-top:4px"><span class="note">Synthetic rating from coverage:</span><div class="chips" id="c1Rate"><button class="chip" type="button" data-v="AA" aria-pressed="false">AA</button><button class="chip" type="button" data-v="A" aria-pressed="false">A</button><button class="chip" type="button" data-v="A-" aria-pressed="false">A−</button><button class="chip" type="button" data-v="BBB" aria-pressed="false">BBB</button></div></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="1" type="button">Check step 1</button><button class="btn ghost small" data-show="1" type="button" hidden>Show the solution</button></div><p class="status" id="c1Msg"></p></div>
+    <div class="panel"><h3>Step 2: WACC at today's debt ratio (Part II)</h3><div class="row" id="c2"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="2" type="button">Check step 2</button><button class="btn ghost small" data-show="2" type="button" hidden>Show the solution</button></div><p class="status" id="c2Msg"></p></div>
+    <div class="panel"><h3>Step 3: WACC 10 points lower and 10 points higher</h3><div class="row" id="c3"></div>
+      <div class="row" style="align-items:center;margin-top:4px"><span class="note">Which debt ratio minimises WACC?</span><div class="chips" id="c3Min"><button class="chip" type="button" data-v="20" aria-pressed="false">20%</button><button class="chip" type="button" data-v="30" aria-pressed="false">30% (today)</button><button class="chip" type="button" data-v="40" aria-pressed="false">40%</button></div></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="3" type="button">Check step 3</button><button class="btn ghost small" data-show="3" type="button" hidden>Show the solution</button></div><p class="status" id="c3Msg"></p></div>
+    <div class="panel"><h3>Step 4: judgement and recommendation</h3>
+      <div id="c4"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="4" type="button">Check step 4</button><button class="btn ghost small" data-show="4" type="button" hidden>Show the solution</button><button class="btn ghost small" id="cReset" type="button">Start again</button></div><p class="status" id="c4Msg"></p></div>
+  </section>
+
+  <p class="note" style="margin-top:28px">All companies are fictional. Slide numbers refer to the lecture deck, Capital Structure. The lecture's AstraZeneca calculations are in Capital_Structure_Workbook.xlsx.</p>
+</div>
+
+<script>
+// ===== helpers =====
+const $=s=>document.querySelector(s);
+const fmt=(x,d=2)=>Number.isFinite(x)?x.toLocaleString("en-GB",{minimumFractionDigits:d,maximumFractionDigits:d}):"n/a";
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function el(tag,attrs={},text){const e=document.createElement(tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!==undefined)e.textContent=text;return e;}
+function stats(box,items){box.replaceChildren(...items.map(([k,v])=>{const d=el("div",{class:"stat"});d.append(el("div",{class:"v"},v),el("div",{class:"k"},k));return d;}));}
+function table(tb,head,rows){tb.replaceChildren();const hr=el("tr");head.forEach(h=>hr.append(el("th",{},h)));tb.append(hr);rows.forEach(r=>{const tr=el("tr");r.forEach(c=>{const td=el("td");if(c instanceof Node)td.append(c);else td.textContent=c;tr.append(td);});tb.append(tr);});}
+const NS="http://www.w3.org/2000/svg";
+function svgEl(tag,attrs){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+function svgText(svg,x,y,t,anchor="middle",extra={}){const tx=svgEl("text",Object.assign({x,y,"text-anchor":anchor},extra));tx.textContent=t;svg.append(tx);return tx;}
+function niceStep(x){const p=Math.pow(10,Math.floor(Math.log10(x)));const n=x/p;return (n<1.5?1:n<3?2:n<7?5:10)*p;}
+function range(a,b,s){const out=[];for(let v=a;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));return out;}
+function axes(svg,{xMin,xMax,yMin,yMax,xStep,yStep,xFmt,yFmt,xTitle,yTitle,m}){m=m||{l:52,r:14,t:12,b:38};const vb=svg.viewBox.baseVal,W=vb.width,H=vb.height;
+ const X=x=>m.l+(x-xMin)/(xMax-xMin)*(W-m.l-m.r),Y=y=>H-m.b-(y-yMin)/(yMax-yMin)*(H-m.t-m.b);svg.replaceChildren();
+ for(const t of range(Math.ceil(yMin/yStep)*yStep,yMax,yStep)){svg.append(svgEl("line",{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:"grid"}));svgText(svg,m.l-6,Y(t)+4,yFmt(t),"end");}
+ for(const t of range(Math.ceil(xMin/xStep)*xStep,xMax,xStep))svgText(svg,X(t),H-m.b+16,xFmt(t));
+ if(xTitle)svgText(svg,(m.l+W-m.r)/2,H-4,xTitle);if(yTitle)svgText(svg,12,(m.t+H-m.b)/2,yTitle,"middle",{transform:`rotate(-90 12 ${(m.t+H-m.b)/2})`});
+ svg.append(svgEl("line",{x1:m.l,x2:m.l,y1:m.t,y2:H-m.b,class:"grid"}));return {X,Y,W,H,m};}
+function path(svg,pts,color,width=2.5,dash=""){svg.append(svgEl("path",{d:pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" "),fill:"none",stroke:css(color),"stroke-width":width,"stroke-dasharray":dash}));}
+function dot(svg,x,y,color,r=6){svg.append(svgEl("circle",{cx:x,cy:y,r,fill:css(color),stroke:css("--surface"),"stroke-width":2}));}
+function chipGroup(sel,cb){const cs=[...document.querySelectorAll(sel+" .chip")];cs.forEach(c=>c.addEventListener("click",()=>{cs.forEach(x=>x.setAttribute("aria-pressed",x===c));cb(c);}));return ()=>cs.find(c=>c.getAttribute("aria-pressed")==="true");}
+
+const money=x=>(x<-0.005?"−$":"$")+fmt(Math.abs(x),2)+"m";
+const m1=x=>x===null||x===undefined?"":(Math.abs(x)<0.005?"0.0":(x<0?"("+fmt(-x,1)+")":fmt(x,1)));
+const sg2=x=>(x<0?"−":"")+fmt(Math.abs(x),2);
+const ann=(r,n)=>(1-Math.pow(1+r,-n))/r;
+function irrF(cf){const f=r=>cf.reduce((a,c,t)=>a+c/Math.pow(1+r,t),0);let lo=-0.99,hi=10,flo=f(lo);if(flo*f(hi)>0)return NaN;for(let i=0;i<200;i++){const m=(lo+hi)/2,fm=f(m);if(flo*fm<=0)hi=m;else{lo=m;flo=fm;}}return (lo+hi)/2;}
+
+// ===== shared: Damodaran coverage table (large non-financial firms, January 2026)
+const TAB=[[-1e9,0.2,"D",0.19],[0.2,0.65,"C",0.16],[0.65,0.8,"CC",0.1261],[0.8,1.25,"CCC",0.0885],[1.25,1.5,"B−",0.0509],[1.5,1.75,"B",0.0321],[1.75,2,"B+",0.0275],[2,2.25,"BB",0.0184],[2.25,2.5,"BB+",0.0138],[2.5,3,"BBB",0.0111],[3,4.25,"A−",0.0089],[4.25,5.5,"A",0.0078],[5.5,6.5,"A+",0.0070],[6.5,8.5,"AA",0.0055],[8.5,1e12,"AAA",0.0040]];
+function rateOf(cov){for(const [lo,hi,r,s] of TAB){if(cov>lo&&cov<=hi)return {r,s};}return {r:"AAA",s:0.004};}
+const pc=(x,d=2)=>fmt(x*100,d)+"%";
+const gbp=x=>(x<0?"−£":"£")+fmt(Math.abs(x),1)+"m";
+// cost of capital at debt ratio d, with the rating found in rounds
+function coc(d,p){const D=d*p.V,E=p.V-D;const ke0=p.rf+p.bu*p.erp;
+ if(D<=0)return {d,D,E,rating:"n/a",cov:null,kd:null,bl:p.bu,ke:ke0,wacc:ke0,rounds:[]};
+ let kd=p.kd0,rounds=[],r,cov;
+ for(let i=0;i<20;i++){const interest=D*kd;cov=p.ebit/interest;r=rateOf(cov);rounds.push({kd,interest,cov,rating:r.r});const nk=p.rf+r.s;if(Math.abs(nk-kd)<1e-12)break;kd=nk;}
+ const bl=p.bu*(1+(1-p.t)*D/E),ke=p.rf+bl*p.erp;return {d,D,E,rating:r.r,cov,kd,bl,ke,wacc:(E/p.V)*ke+(D/p.V)*kd*(1-p.t),rounds};}
+
+// ===== 1 quiz
+const QUIZ=[
+ {q:"A firm has invested capital of £50m and EBIT of £8m. It finances £20m with debt at 5% and the rest with equity. Tax is 25%. Its ROE is:",o:["12.0%","17.5%","14.0%","23.3%"],a:1,e:"Net income = (8 − 20 × 5%) × 0.75 = 5.25; equity = 30; ROE = 5.25 / 30 = 17.5%. ROIC is 8 × 0.75 / 50 = 12.0% (slides 5 to 7)."},
+ {q:"A firm earns an ROIC of 6%. It can borrow at 9% before tax; the tax rate is 25%. Borrowing more will:",o:["Raise expected ROE, because debt is cheaper than equity","Lower expected ROE, because ROIC is below the after-tax cost of debt of 6.75%","Leave ROE unchanged","Lower ROIC"],a:1,e:"Leverage raises expected ROE only when ROIC exceeds rd(1 − T) = 9% × 0.75 = 6.75%. Here 6% < 6.75% (slide 7)."},
+ {q:"Interest expense is £40m. The marginal tax rate is 25% and the effective tax rate 15%. The annual interest tax shield to report is:",o:["£10m","£6m","£40m","£4m"],a:0,e:"Use the marginal rate: 25% × 40 = £10m. The effective rate mixes in reliefs and other countries' rates (slide 15)."},
+ {q:"A company keeps £800m of debt outstanding permanently. Tax is 25%. The present value of its interest tax shields is:",o:["£200m","£50m","£800m","It depends on the interest rate"],a:0,e:"For permanent debt, PV(tax shields) = T × D = 0.25 × 800 = £200m. The interest rate cancels out (slide 15)."},
+ {q:"EBIT is £270m and interest expense £60m. The risk-free rate is 4.2%. Using the lecture's coverage table, the pre-tax cost of debt is:",o:["4.98%","5.09%","4.60%","5.31%"],a:0,e:"Coverage = 270 / 60 = 4.5x, in the 4.25 to 5.5 band: rating A, spread 0.78%. Cost of debt = 4.2% + 0.78% = 4.98% (slide 18)."},
+ {q:"The unlevered beta is 0.8. The firm moves to a debt/equity ratio of 0.5; tax is 25%. The levered beta is:",o:["0.80","1.10","1.20","0.95"],a:1,e:"βL = 0.8 × [1 + 0.75 × 0.5] = 0.8 × 1.375 = 1.10 (slide 24)."},
+ {q:"A comparable company has an equity beta of 1.5, a debt/equity ratio of 1.0 and a tax rate of 20%. Its unlevered beta is:",o:["0.75","0.83","1.20","1.50"],a:1,e:"βU = 1.5 / [1 + 0.8 × 1.0] = 1.5 / 1.8 = 0.83 (slide 24)."},
+ {q:"Debt is 40% of capital at a pre-tax cost of 6%; equity costs 11%; tax is 25%. WACC is:",o:["8.4%","9.0%","8.8%","7.2%"],a:0,e:"WACC = 0.6 × 11% + 0.4 × 6% × 0.75 = 6.6% + 1.8% = 8.4% (slide 29)."},
+ {q:"An all-equity firm has EBIT of £10m, 5m shares at £30 and a 25% tax rate. It borrows £30m at 6% and buys back 1m shares. EPS becomes:",o:["£1.50","£1.54","£1.88","£1.35"],a:1,e:"Before: 10 × 0.75 / 5 = £1.50. After: (10 − 1.8) × 0.75 / 4 = £1.54. Higher EPS does not mean higher value: check the WACC (slides 27 and 31)."},
+ {q:"A UK retailer with sterling revenues and 15-year store leases needs to refinance a loan. Which choice matches its cash flows best?",o:["Short-term US dollar commercial paper","A long-dated, fixed-rate sterling bond","A floating-rate euro loan due in two years","Perpetual preference shares"],a:1,e:"Match the currency of the cash flows (sterling) and the life of the assets (long-dated); fixed rate removes interest rate risk (slide 41)."}];
+let quizAns={};
+function renderQuiz(){const box=$("#quizbox");box.replaceChildren();
+ QUIZ.forEach((it,qi)=>{const q=el("div",{class:"q"});q.append(el("p",{},(qi+1)+". "+it.q));const opts=el("div",{class:"opts",role:"radiogroup"});
+  it.o.forEach((o,oi)=>{const lab=el("label",{class:"opt"});const inp=el("input",{type:"radio",name:"q"+qi,id:`q${qi}o${oi}`});lab.setAttribute("for",`q${qi}o${oi}`);
+   if(quizAns[qi]!==undefined){inp.disabled=true;if(oi===it.a)lab.classList.add("right");if(oi===quizAns[qi]&&oi!==it.a)lab.classList.add("wrong");if(oi===quizAns[qi])inp.checked=true;}
+   inp.addEventListener("change",()=>{quizAns[qi]=oi;renderQuiz();});lab.append(inp,el("span",{},o));opts.append(lab);});
+  q.append(opts);if(quizAns[qi]!==undefined){const ok=quizAns[qi]===it.a;const fb=el("div",{class:"fb "+(ok?"ok":"no")});fb.innerHTML=((ok?"Correct. ":"Not quite. ")+it.e).replace(/β([LU])/g,"β<sub>$1</sub>");q.append(fb);}
+  box.append(q);});
+ const score=Object.entries(quizAns).filter(([qi,a])=>QUIZ[qi].a===a).length;$("#quizscore").textContent=`Score: ${score} / ${QUIZ.length}`;}
+$("#quizReset").addEventListener("click",()=>{quizAns={};renderQuiz();});
+
+// ===== 2 sort
+const SORT=[
+ ["Revolving credit facility, £400m, SONIA + 1.2%, secured on ships","debt","A fixed claim with deductible interest, ranking first in default."],
+ ["Senior unsecured bond, £600m, 5.25%, due 2034","debt","Fixed coupons, tax-deductible, a maturity date and priority over shareholders."],
+ ["Lease liabilities on port terminals, £250m","debt","Under IFRS 16 leases are fixed obligations, treated like secured debt."],
+ ["Commercial paper, £100m, 90-day","debt","Short-term borrowing: a fixed claim repaid at maturity."],
+ ["Perpetual subordinated hybrid bond; coupons can be deferred","hybrid","Fixed but deferrable coupons, no maturity and junior ranking: rating agencies give part equity credit."],
+ ["Convertible bond, £200m, 1.5%, convertible at £8 a share","hybrid","A straight bond plus an option on the shares; IFRS splits it into debt and equity parts."],
+ ["Cumulative preference shares, 6% dividend","hybrid","A fixed dividend that can be skipped (but accumulates), not tax-deductible, ranking after all debt: mostly equity."],
+ ["Ordinary shares, 300m in issue","equity","The residual claim: no fixed payment, no maturity, last in line, with control rights."]];
+let sortAns={},sortChecked=false;
+function renderSort(){const g=$("#sGrid");g.replaceChildren();
+ SORT.forEach(([txt,ans,why],i)=>{const card=el("div",{class:"sortcard"});if(sortChecked&&sortAns[i])card.classList.add(sortAns[i]===ans?"done-ok":"done-no");
+  card.append(el("p",{class:"st"},txt));const ch=el("div",{class:"chips"});
+  [["debt","Debt"],["hybrid","Hybrid"],["equity","Equity"]].forEach(([v,l])=>{const b=el("button",{class:"chip",type:"button","aria-pressed":sortAns[i]===v},l);
+   if(sortChecked){b.disabled=true;if(v===ans)b.classList.add("good");else if(sortAns[i]===v)b.classList.add("badc");}
+   b.addEventListener("click",()=>{if(sortChecked)return;sortAns[i]=v;renderSort();});ch.append(b);});
+  card.append(ch);if(sortChecked)card.append(el("p",{class:"note",style:"margin:0"},why));g.append(card);});}
+$("#sCheck").addEventListener("click",()=>{const n=Object.keys(sortAns).length;if(n<SORT.length){$("#sMsg").textContent=`Place all ${SORT.length} instruments first (${n} done).`;return;}
+ sortChecked=true;renderSort();const ok=SORT.filter((s,i)=>sortAns[i]===s[1]).length;$("#sMsg").textContent=`${ok} of ${SORT.length} right. Total debt in the financing table: 400 + 600 + 250 + 100 = £1,350m, with the hybrid bond and convertible shown separately.`;});
+$("#sReset").addEventListener("click",()=>{sortAns={};sortChecked=false;$("#sMsg").textContent="";renderSort();});
+
+// ===== 3 mini case
+const KP={V:8000,ebit:400,bu:0.70,rf:0.045,erp:0.05,t:0.25};
+function kSolve(){const cov=400/100,r0=rateOf(cov),p={...KP,kd0:KP.rf+r0.s};
+ const a=coc(0.3,p),b=coc(0.2,p),c=coc(0.4,p);
+ return {shield:0.25*100,pv:0.25*2400,cov,de:2400/600,rate:r0.r,dv:30,bl:a.bl,ke:a.ke*100,kd:a.kd*100,w30:a.wacc*100,w20:b.wacc*100,kd40:c.kd*100,w40:c.wacc*100,b,c,a};}
+const CS={1:[["c1a","Annual interest tax shield (£m)","shield",0.06],["c1b","PV of tax shields if debt is permanent (£m)","pv",0.6],["c1c","Interest coverage (x)","cov",0.011],["c1d","Debt / EBITDA (x)","de",0.011]],
+ 2:[["c2a","Debt / (debt + equity) (%)","dv",0.06],["c2b","Levered beta","bl",0.006],["c2c","Cost of equity (%)","ke",0.021],["c2d","Pre-tax cost of debt (%)","kd",0.011],["c2e","WACC (%)","w30",0.021]],
+ 3:[["c3a","WACC at 20% debt (%)","w20",0.021],["c3b","Cost of debt at 40% after the rounds (%)","kd40",0.011],["c3c","WACC at 40% debt (%)","w40",0.021]]};
+const C4=[["Compared with the sector (22%) and the market (21%), Kestrel's 30% debt ratio is:",["Lower","About the same","Higher"],2,"30% is above both, and debt/EBITDA of 4.0x is high."],
+ ["Your recommendation on the debt ratio:",["Raise it to 40% for a bigger tax shield","Keep it around 30% and go no higher","Cut it to 20%"],1,"30% gives the lowest WACC of the three; at 40% the rating falls to B and the WACC jumps. Cutting to 20% raises the WACC slightly, though it would add headroom."],
+ ["How should Kestrel refinance the floating-rate bank loan due 2028?",["Short-term US dollar commercial paper","A long-dated, fixed-rate sterling bond","Perpetual preference shares in euros"],1,"Sterling matches its revenues, a long maturity matches its stores and leases, and a fixed rate removes interest rate risk."]];
+let c4Ans={},c1Rate=null,c3Min=null;
+function buildCase(){Object.entries(CS).forEach(([st,arr])=>{const box=$("#c"+st);box.replaceChildren(...arr.map(([id,lab])=>{const f=el("div",{class:"field"});const i=el("input",{type:"number",id,step:"0.01"});i.addEventListener("input",()=>{i.style.borderColor="";$("#c"+st+"Msg").textContent="";});f.append(el("label",{for:id},lab),i);return f;}));});
+ const b4=$("#c4");b4.replaceChildren();C4.forEach(([q,opts],qi)=>{const w=el("div",{style:"margin-bottom:10px"});w.append(el("p",{style:"margin:0 0 6px;font-weight:500"},q));const ch=el("div",{class:"chips"});
+  opts.forEach((o,oi)=>{const b=el("button",{class:"chip",type:"button","aria-pressed":c4Ans[qi]===oi},o);b.addEventListener("click",()=>{c4Ans[qi]=oi;ch.querySelectorAll(".chip").forEach((x,j)=>x.setAttribute("aria-pressed",j===oi));$("#c4Msg").textContent="";});ch.append(b);});w.append(ch);b4.append(w);});}
+chipGroup("#c1Rate",c=>{c1Rate=c.dataset.v;});chipGroup("#c3Min",c=>{c3Min=c.dataset.v;});
+const HINT={1:"Tax shield = marginal tax rate × interest; PV = tax rate × debt. Coverage = EBIT / interest; debt/EBITDA = 2,400 / 600. Find the coverage band in the table on slide 18 (slide 19 for smaller firms).",
+ 2:"Equity = 400 × 14 = 5,600; D/E = 2,400 / 5,600. βL = 0.70 × [1 + 0.75 × D/E]. Cost of debt = 4.5% + the spread for today's synthetic rating.",
+ 3:"At 20%: debt 1,600; round 1 interest at today's cost of debt, then re-rate. At 40%: debt 3,200; keep re-rating until the rating stops changing (it takes several rounds).",
+ 4:"Compare the ratios, then ask what the WACC curve and the rating say, and what currency and maturity match Kestrel's cash flows."};
+function checkStep(st,show){const S=kSolve();let ok=0,tried=0;
+ (CS[st]||[]).forEach(([id,,key,tol])=>{const i=$("#"+id);if(show)i.value=(key==="bl"?Math.round(S[key]*1000)/1000:Math.round(S[key]*100)/100).toString();if(i.value==="")return;tried++;const g=Math.abs(parseFloat(i.value)-S[key])<=tol;i.style.borderColor=css(g?"--ok":"--bad");if(g)ok++;});
+ let extra="";
+ if(st==1){if(show){c1Rate="A-";document.querySelectorAll("#c1Rate .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v==="A-"));}if(c1Rate){tried++;if(c1Rate==="A-"){ok++;extra=" Rating right: coverage 4.0x is in the 3.00 to 4.25 band, A−.";}else extra=" Check the rating band for coverage of 4.0x.";}}
+ if(st==3){if(show){c3Min="30";document.querySelectorAll("#c3Min .chip").forEach(c=>c.setAttribute("aria-pressed",c.dataset.v==="30"));}if(c3Min){tried++;if(c3Min==="30")ok++;else extra=" Compare the three WACCs again.";}}
+ if(st==4){if(show)C4.forEach((q,qi)=>{c4Ans[qi]=q[2];});tried=Object.keys(c4Ans).length;ok=C4.filter((q,qi)=>c4Ans[qi]===q[2]).length;if(show)buildCase4();}
+ if(!show&&tried>0){const sb=document.querySelector(`[data-show="${st}"]`);if(sb)sb.hidden=false;}
+ let msg=tried===0?"Enter at least one answer first.":`${ok} of ${tried} right.`+extra+(ok<tried?" Hint: "+HINT[st]:"");
+ if(show){const b=S.b,c=S.c;const sol={
+  1:`Tax shield 25% × 100 = £25m a year; PV 25% × 2,400 = £600m (7.5% of debt plus equity of £8,000m). Coverage 400 / 100 = 4.00x, rating A−; debt/EBITDA 2,400 / 600 = 4.00x.`,
+  2:`D/(D+E) = 2,400 / 8,000 = 30%; D/E = 0.4286; βL = 0.70 × [1 + 0.75 × 0.4286] = ${fmt(S.bl,3)}; ke = 4.5% + ${fmt(S.bl,3)} × 5% = ${fmt(S.ke,2)}%; kd = 4.5% + 0.89% = ${fmt(S.kd,2)}%; WACC = 0.7 × ${fmt(S.ke,2)}% + 0.3 × ${fmt(S.kd,2)}% × 0.75 = ${fmt(S.w30,2)}%.`,
+  3:`20%: ${b.rounds.map(x=>`interest ${fmt(x.interest,1)}, coverage ${fmt(x.cov,2)}x → ${x.rating}`).join("; ")}; kd ${pc(b.kd)}, WACC ${fmt(S.w20,2)}%. 40%: ${c.rounds.map(x=>x.rating).join(" → ")}, kd ${pc(c.kd)}, WACC ${fmt(S.w40,2)}%. Lowest: 30%, today's ratio.`,
+  4:C4.map(q=>q[3]).join(" ")}[st];msg="Solution: "+sol;}
+ $("#c"+st+"Msg").innerHTML=msg.replace(/β([LU])/g,"β<sub>$1</sub>");}
+function buildCase4(){const b4=$("#c4");b4.querySelectorAll(".chips").forEach((ch,qi)=>ch.querySelectorAll(".chip").forEach((x,j)=>x.setAttribute("aria-pressed",j===c4Ans[qi])));}
+document.querySelectorAll("[data-step]").forEach(b=>b.addEventListener("click",()=>checkStep(+b.dataset.step,false)));
+document.querySelectorAll("[data-show]").forEach(b=>b.addEventListener("click",()=>checkStep(+b.dataset.show,true)));
+$("#cReset").addEventListener("click",()=>{c4Ans={};c1Rate=null;c3Min=null;buildCase();document.querySelectorAll("#c1Rate .chip,#c3Min .chip").forEach(c=>c.setAttribute("aria-pressed","false"));[1,2,3,4].forEach(s=>$("#c"+s+"Msg").textContent="");document.querySelectorAll("[data-show]").forEach(b=>b.hidden=true);});
+
+// ===== tabs and boot
+const tabs=[...document.querySelectorAll('nav.tabs button')];
+function showTab(id){tabs.forEach(b=>{const on=b.getAttribute("aria-controls")===id;b.setAttribute("aria-selected",on);document.getElementById(b.getAttribute("aria-controls")).hidden=!on;});try{localStorage.setItem("cs-tab",id);}catch(e){}}
+tabs.forEach(b=>b.addEventListener("click",()=>showTab(b.getAttribute("aria-controls"))));
+renderQuiz();renderSort();buildCase();
+try{const t=localStorage.getItem("cs-tab");if(t&&document.getElementById(t))showTab(t);}catch(e){}
+
+</script>
+</body>
+</html>
