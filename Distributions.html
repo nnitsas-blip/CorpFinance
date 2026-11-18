@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Capital Structure and Payout</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky tab bar over a single 1100px column; each tab is a workbench of panels (controls left, readout right) */
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#16202C; --muted:#5B6B82; --line:#D9E0E8;
+  --navy:#0E1A2B; --teal:#0E8A96; --amber:#C98A22; --red:#C2453B; --slate:#5B6B82; --tint:#E8F3F4;
+  --ok:#1E7F4F; --bad:#B23A30;
+  --f-display:"Newsreader", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C141F; --surface:#131E2C; --ink:#E6ECF2; --muted:#9AA9BC; --line:#26354A;
+  --navy:#E6ECF2; --teal:#4FC3CC; --amber:#E8B04F; --red:#EE7A6E; --slate:#9AA9BC; --tint:#14303A;
+  --ok:#5FD39A; --bad:#F08A80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C141F; --surface:#131E2C; --ink:#E6ECF2; --muted:#9AA9BC; --line:#26354A;
+  --navy:#E6ECF2; --teal:#4FC3CC; --amber:#E8B04F; --red:#EE7A6E; --slate:#9AA9BC; --tint:#14303A;
+  --ok:#5FD39A; --bad:#F08A80; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+.kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+.sub{color:var(--muted);margin:4px 0 0;max-width:62ch}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin:0 -16px 20px;padding:8px 16px 0}
+nav.tabs button{font:inherit;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px 10px;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--teal)}
+nav.tabs button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.tabnum{font-family:var(--f-mono);font-size:12px;color:var(--teal);margin-right:6px}
+section.tab{display:grid;gap:18px}
+h2{font-family:var(--f-display);font-size:26px;font-weight:700;margin:0;text-wrap:balance}
+h3{font-size:16px;font-weight:600;margin:0 0 8px}
+.lede{color:var(--muted);margin:2px 0 0;max-width:70ch}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:820px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.panel.flat{background:var(--tint);border-color:transparent}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field{display:grid;gap:4px;margin-bottom:12px}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.row>.field{flex:1 1 120px}
+input[type=number],input[type=text],select,textarea{font:inherit;font-family:var(--f-mono);font-size:14px;width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+textarea{font-family:var(--f-body);resize:vertical;min-height:60px}
+input[type=range]{width:100%;accent-color:var(--teal)}
+.rangeval{font-family:var(--f-mono);font-size:14px;color:var(--ink)}
+button.btn{font:inherit;font-weight:500;padding:8px 14px;border-radius:6px;border:1px solid var(--teal);background:var(--teal);color:var(--surface);cursor:pointer}
+button.btn.ghost{background:transparent;color:var(--teal)}
+button.btn.small{padding:4px 10px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:var(--surface)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--tint);border-radius:8px;padding:10px 12px}
+.stat .v{font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.stat .k{font-size:12px;color:var(--muted)}
+.rating{display:inline-block;font-family:var(--f-mono);font-weight:500;padding:2px 8px;border-radius:4px;color:#fff}
+.rating.ig{background:#1E7F4F}.rating.bbb{background:#B07A12}.rating.hy{background:#B23A30}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.tablewrap{overflow-x:auto}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--f-body);font-size:11px}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.note{font-size:13px;color:var(--muted)}
+.q{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.q:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.q p{margin:0 0 8px;font-weight:500}
+.opts{display:grid;gap:6px}
+.opt{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:6px;cursor:pointer;background:var(--surface)}
+.opt input{margin-top:4px}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--surface))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
+.fb{font-size:14px;margin-top:6px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.ans{display:grid;grid-template-columns:minmax(0,1fr) 120px auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.ans:last-child{border-bottom:0}
+.ans .mark{font-size:13px;min-width:70px}
+.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+.given{font-family:var(--f-mono);font-size:13px;background:var(--tint);border-radius:6px;padding:8px 10px;margin:6px 0 10px;line-height:1.7}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.role{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface)}
+.role h4{margin:0 0 6px;font-size:15px}
+.role p{margin:0 0 6px;font-size:13.5px}
+.role ul{margin:0;padding-left:18px;font-size:13.5px}
+.bar{height:26px;border-radius:4px;background:var(--teal);min-width:2px;transition:width .3s}
+.barrow{display:grid;grid-template-columns:150px minmax(0,1fr) 44px;gap:10px;align-items:center;margin-bottom:8px;font-size:14px}
+.barrow .n{font-family:var(--f-mono);text-align:right}
+.reasons{display:grid;gap:6px;max-height:260px;overflow:auto;margin-top:10px}
+.reasons div{font-size:13.5px;background:var(--tint);border-radius:6px;padding:6px 10px}
+.status{font-size:13px;color:var(--muted)}
+details summary{cursor:pointer;color:var(--teal);font-weight:500}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:520px){.ans{grid-template-columns:minmax(0,1fr) 100px}.ans .mark{grid-column:1/-1}.barrow{grid-template-columns:110px minmax(0,1fr) 36px}}
+
+</style>
+<style>
+.eq{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;margin:6px 0}
+.eq math{font-size:1.12em;color:var(--ink);overflow-x:auto;max-width:100%}
+.eqn{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.eqs{display:grid;gap:2px}
+#c1 .field,#c2 .field,#k1 .field,#k3 .field{flex:1 1 200px}
+.split{display:flex;height:30px;border-radius:6px;overflow:hidden;margin:8px 0 4px;background:var(--line)}
+.split div{height:100%;transition:width .3s}
+.keyrow{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted)}
+.keyrow i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.callout{font-size:14px;margin:10px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="kicker">FIN7F2 Corporate Finance · Lectures 9a and 9</p>
+      <h1>Capital Structure and Payout</h1>
+      <p class="sub">A quiz on capital structure theory (Lecture 9a), then three activities on returning cash to shareholders (Lecture 9). All companies here are fictional. Equation numbers (9.1) to (9.14) are the same as in the Lecture 9 slides.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Activities">
+    <button role="tab" id="t-quizA" aria-controls="quizA" aria-selected="true"><span class="tabnum">1</span>Capital structure quiz</button>
+    <button role="tab" id="t-quiz" aria-controls="quiz" aria-selected="false"><span class="tabnum">2</span>Payout quiz</button>
+    <button role="tab" id="t-pol" aria-controls="pol" aria-selected="false"><span class="tabnum">3</span>Choosing a policy</button>
+    <button role="tab" id="t-case" aria-controls="case" aria-selected="false"><span class="tabnum">4</span>Mini case</button>
+  </nav>
+
+  <!-- 1 QUIZ -->
+  <!-- 1 CAPITAL STRUCTURE QUIZ (Lecture 9a) -->
+  <section class="tab" id="quizA" role="tabpanel" aria-labelledby="t-quizA">
+    <div><h2>Capital structure quiz</h2><p class="lede">Nine questions on Lecture 9a, Capital Structure Decisions. Each answer locks once chosen and shows the reasoning and the Lecture 9a slide to revisit.</p></div>
+    <div class="panel"><div id="quizAbox"></div><p class="status" id="quizAscore" style="margin-top:12px"></p><button class="btn ghost small" id="quizAReset">Start again</button></div>
+  </section>
+
+  <section class="tab" id="quiz" role="tabpanel" aria-labelledby="t-quiz" hidden>
+    <div><h2>Payout quiz</h2><p class="lede">Ten mini exercises on Lecture 9, each with its own numbers. Each answer locks once chosen and shows the working and the Lecture 9 slide to revisit.</p></div>
+    <div class="panel"><details><summary>Equations used in the quiz</summary><div class="eqs"><div class="eq"><math display="block"><mrow><mtext>Dividend yield</mtext><mo>=</mo><mfrac><mrow><mtext>Dividends per share</mtext></mrow><mrow><mtext>Share price</mtext></mrow></mfrac></mrow></math><span class="eqn">(9.2)</span></div><div class="eq"><math display="block"><mrow><mtext>Total payout yield</mtext><mo>=</mo><mfrac><mrow><mtext>Dividends + Repurchases</mtext></mrow><mrow><mtext>Market capitalisation</mtext></mrow></mfrac></mrow></math><span class="eqn">(9.4)</span></div><div class="eq"><math display="block"><mrow><mtext>Payout ratio</mtext><mo>=</mo><mfrac><mrow><mtext>Dividends</mtext></mrow><mrow><mtext>Net income</mtext></mrow></mfrac><mo>=</mo><mfrac><mrow><mtext>DPS</mtext></mrow><mrow><mtext>EPS</mtext></mrow></mfrac></mrow></math><span class="eqn">(9.5)</span></div><div class="eq"><math display="block"><mrow><mtext>Distribution</mtext><mo>=</mo><mtext>Net income</mtext><mo>−</mo><msub><mi>w</mi><mi>s</mi></msub><mo>×</mo><mtext>Capital budget</mtext></mrow></math><span class="eqn">(9.7)</span></div><div class="eq"><math display="block"><mrow><mi>g</mi><mo>=</mo><mo>(</mo><mn>1</mn><mo>−</mo><mtext>Payout ratio</mtext><mo>)</mo><mo>×</mo><mtext>ROE</mtext></mrow></math><span class="eqn">(9.8)</span></div><div class="eq"><math display="block"><mrow><msub><mi>k</mi><mi>s</mi></msub><mo>=</mo><mfrac><mrow><msub><mi>D</mi><mn>1</mn></msub></mrow><mrow><msub><mi>P</mi><mn>0</mn></msub></mrow></mfrac><mo>+</mo><mi>g</mi></mrow></math><span class="eqn">(9.9)</span></div><div class="eq"><math display="block"><mrow><msub><mi>P</mi><mtext>ex</mtext></msub><mo>≈</mo><msub><mi>P</mi><mtext>cum</mtext></msub><mo>−</mo><mtext>DPS</mtext></mrow></math><span class="eqn">(9.10)</span></div><div class="eq"><math display="block"><mrow><mtext>Shares repurchased</mtext><mo>=</mo><mfrac><mrow><mtext>Cash used</mtext></mrow><mrow><mtext>Price before</mtext></mrow></mfrac></mrow></math><span class="eqn">(9.13)</span></div><div class="eq"><math display="block"><mrow><msub><mi>P</mi><mtext>after</mtext></msub><mo>=</mo><msub><mi>P</mi><mtext>before</mtext></msub><mo>×</mo><mfrac><mrow><msub><mi>n</mi><mtext>before</mtext></msub></mrow><mrow><msub><mi>n</mi><mtext>after</mtext></msub></mrow></mfrac></mrow></math><span class="eqn">(9.14)</span></div></div></details></div>
+    <div class="panel"><div id="quizbox"></div><p class="status" id="quizscore" style="margin-top:12px"></p><button class="btn ghost small" id="quizReset">Start again</button></div>
+  </section>
+
+  <!-- 2 POLICY EXERCISE -->
+  <section class="tab" id="pol" role="tabpanel" aria-labelledby="t-pol" hidden>
+    <div><h2>Choosing a policy: Keswick Instruments plc</h2><p class="lede">One windfall year, four ways to set the dividend (slides 19 to 27). Enter your answers and check each step; once you have checked a step, you can also see its solution. Give £m to two decimal places.</p></div>
+    <div class="panel flat">
+      <h3>The facts (£m, fictional)</h3>
+      <ul class="facts">
+        <li>Last year, a normal year: net income <b>£14.0m</b>, dividends <b>£4.2m</b>. Earnings have grown steadily at <b>8%</b> a year.</li>
+        <li>This year net income jumps to <b>£21.0m</b> because of a one-off contract. Growth returns to 8% afterwards.</li>
+        <li>Good investment projects this year: <b>£12.0m</b>. Target capital structure: <b>30%</b> debt, <b>70%</b> equity.</li>
+      </ul>
+      <details><summary>Equations for this exercise</summary><div class="eqs"><div class="eq"><math display="block"><mrow><mtext>Payout ratio</mtext><mo>=</mo><mfrac><mrow><mtext>Dividends</mtext></mrow><mrow><mtext>Net income</mtext></mrow></mfrac><mo>=</mo><mfrac><mrow><mtext>DPS</mtext></mrow><mrow><mtext>EPS</mtext></mrow></mfrac></mrow></math><span class="eqn">(9.5)</span></div><div class="eq"><math display="block"><mrow><mtext>Distribution</mtext><mo>=</mo><mtext>Net income</mtext><mo>−</mo><msub><mi>w</mi><mi>s</mi></msub><mo>×</mo><mtext>Capital budget</mtext></mrow></math><span class="eqn">(9.7)</span></div></div></details>
+    </div>
+    <div class="panel"><h3>Step 1: this year's total dividends under four policies</h3><div class="row" id="k1"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-kstep="1" type="button">Check step 1</button><button class="btn ghost small" data-kshow="1" type="button" hidden>Show the solution</button></div><p class="status" id="k1Msg"></p></div>
+    <div class="panel"><h3>Step 2: which policy?</h3><div id="k2"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-kstep="2" type="button">Check step 2</button><button class="btn ghost small" data-kshow="2" type="button" hidden>Show the solution</button><button class="btn ghost small" id="kReset" type="button">Start again</button></div><p class="status" id="k2Msg"></p></div>
+  </section>
+
+  <!-- 3 MINI CASE -->
+  <section class="tab" id="case" role="tabpanel" aria-labelledby="t-case" hidden>
+    <div><h2>Mini case: Ellison Healthcare plc</h2><p class="lede">Work Part III of the assignment on one company. Enter your answers and check each step; once you have checked a step, you can also see its solution. Give percentages to one decimal place (two for yields) and £m to the nearest whole number.</p></div>
+    <div class="panel flat">
+      <h3>The analyst's file (£m, fictional)</h3>
+      <div class="tablewrap"><table>
+        <tr><th></th><th>2023</th><th>2024</th><th>2025</th></tr>
+        <tr><td>Net income</td><td>1,500</td><td>1,650</td><td>1,800</td></tr>
+        <tr><td>Dividends paid</td><td>630</td><td>675</td><td>720</td></tr>
+        <tr><td>Share repurchases</td><td>0</td><td>0</td><td>400</td></tr>
+        <tr><td>Cash at year end</td><td>2,100</td><td>2,650</td><td>3,200</td></tr>
+      </table></div>
+      <ul class="facts">
+        <li>2025: operating cash flow <b>£2,900m</b>; capital expenditure and purchases of intangibles <b>£900m</b>. Net debt is low and the rating is A.</li>
+        <li><b>1,500m</b> shares at <b>£16.00</b>. The board says it has "a progressive dividend policy".</li>
+        <li>Benchmarks: US pharmaceutical sector payout ratio <b>58.6%</b>, total payout ratio <b>83.1%</b>, cash returned <b>73.7%</b> of FCFE before net borrowing (Damodaran, January 2026); UK market prospective dividend yield <b>3.3%</b> (Computershare, January 2026); UK pharma peer GSK: payout ratio <b>46.8%</b>, dividend yield <b>3.54%</b>, total payout yield <b>5.28%</b> (2025 results; price 16 October 2026).</li>
+      </ul>
+      <details><summary>Equations for this case</summary><div class="eqs"><div class="eq"><math display="block"><mrow><mtext>Dividend yield</mtext><mo>=</mo><mfrac><mrow><mtext>Dividends per share</mtext></mrow><mrow><mtext>Share price</mtext></mrow></mfrac></mrow></math><span class="eqn">(9.2)</span></div><div class="eq"><math display="block"><mrow><mtext>Buyback yield</mtext><mo>=</mo><mfrac><mrow><mtext>Repurchases</mtext></mrow><mrow><mtext>Market capitalisation</mtext></mrow></mfrac></mrow></math><span class="eqn">(9.3)</span></div><div class="eq"><math display="block"><mrow><mtext>Total payout yield</mtext><mo>=</mo><mfrac><mrow><mtext>Dividends + Repurchases</mtext></mrow><mrow><mtext>Market capitalisation</mtext></mrow></mfrac></mrow></math><span class="eqn">(9.4)</span></div><div class="eq"><math display="block"><mrow><mtext>Payout ratio</mtext><mo>=</mo><mfrac><mrow><mtext>Dividends</mtext></mrow><mrow><mtext>Net income</mtext></mrow></mfrac><mo>=</mo><mfrac><mrow><mtext>DPS</mtext></mrow><mrow><mtext>EPS</mtext></mrow></mfrac></mrow></math><span class="eqn">(9.5)</span></div><div class="eq"><math display="block"><mrow><mtext>Total payout ratio</mtext><mo>=</mo><mfrac><mrow><mtext>Dividends + Repurchases</mtext></mrow><mrow><mtext>Net income</mtext></mrow></mfrac></mrow></math><span class="eqn">(9.6)</span></div></div></details>
+    </div>
+    <div class="panel"><h3>Step 1: how has Ellison returned cash? (2025 unless stated)</h3><div class="row" id="c1"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="1" type="button">Check step 1</button><button class="btn ghost small" data-show="1" type="button" hidden>Show the solution</button></div><p class="status" id="c1Msg"></p></div>
+    <div class="panel"><h3>Step 2: yields</h3><div class="row" id="c2"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="2" type="button">Check step 2</button><button class="btn ghost small" data-show="2" type="button" hidden>Show the solution</button></div><p class="status" id="c2Msg"></p></div>
+    <div class="panel"><h3>Step 3: against peers and the market</h3><div id="c3"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="3" type="button">Check step 3</button><button class="btn ghost small" data-show="3" type="button" hidden>Show the solution</button></div><p class="status" id="c3Msg"></p></div>
+    <div class="panel"><h3>Step 4: recommendation</h3><div id="c4"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-step="4" type="button">Check step 4</button><button class="btn ghost small" data-show="4" type="button" hidden>Show the solution</button><button class="btn ghost small" id="cReset" type="button">Start again</button></div><p class="status" id="c4Msg"></p></div>
+  </section>
+
+  <p class="note" style="margin-top:28px">All companies are fictional. Slide numbers refer to Lecture 9a: Capital Structure Decisions (tab 1) and Lecture 9: Distributions to Shareholders (tabs 2 to 4). Benchmarks are from the sources named in the case.</p>
+</div>
+<script>
+// ===== helpers =====
+const $=s=>document.querySelector(s);
+const fmt=(x,d=2)=>Number.isFinite(x)?x.toLocaleString("en-GB",{minimumFractionDigits:d,maximumFractionDigits:d}):"n/a";
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function el(tag,attrs={},text){const e=document.createElement(tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!==undefined)e.textContent=text;return e;}
+function stats(box,items){box.replaceChildren(...items.map(([k,v])=>{const d=el("div",{class:"stat"});d.append(el("div",{class:"v"},v),el("div",{class:"k"},k));return d;}));}
+function table(tb,head,rows){tb.replaceChildren();const hr=el("tr");head.forEach(h=>hr.append(el("th",{},h)));tb.append(hr);rows.forEach(r=>{const tr=el("tr");r.forEach(c=>{const td=el("td");if(c instanceof Node)td.append(c);else td.textContent=c;tr.append(td);});tb.append(tr);});}
+const NS="http://www.w3.org/2000/svg";
+function svgEl(tag,attrs){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+function svgText(svg,x,y,t,anchor="middle",extra={}){const tx=svgEl("text",Object.assign({x,y,"text-anchor":anchor},extra));tx.textContent=t;svg.append(tx);return tx;}
+function niceStep(x){const p=Math.pow(10,Math.floor(Math.log10(x)));const n=x/p;return (n<1.5?1:n<3?2:n<7?5:10)*p;}
+function range(a,b,s){const out=[];for(let v=a;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));return out;}
+function axes(svg,{xMin,xMax,yMin,yMax,xStep,yStep,xFmt,yFmt,xTitle,yTitle,m}){m=m||{l:52,r:14,t:12,b:38};const vb=svg.viewBox.baseVal,W=vb.width,H=vb.height;
+ const X=x=>m.l+(x-xMin)/(xMax-xMin)*(W-m.l-m.r),Y=y=>H-m.b-(y-yMin)/(yMax-yMin)*(H-m.t-m.b);svg.replaceChildren();
+ for(const t of range(Math.ceil(yMin/yStep)*yStep,yMax,yStep)){svg.append(svgEl("line",{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:"grid"}));svgText(svg,m.l-6,Y(t)+4,yFmt(t),"end");}
+ for(const t of range(Math.ceil(xMin/xStep)*xStep,xMax,xStep))svgText(svg,X(t),H-m.b+16,xFmt(t));
+ if(xTitle)svgText(svg,(m.l+W-m.r)/2,H-4,xTitle);if(yTitle)svgText(svg,12,(m.t+H-m.b)/2,yTitle,"middle",{transform:`rotate(-90 12 ${(m.t+H-m.b)/2})`});
+ svg.append(svgEl("line",{x1:m.l,x2:m.l,y1:m.t,y2:H-m.b,class:"grid"}));return {X,Y,W,H,m};}
+function path(svg,pts,color,width=2.5,dash=""){svg.append(svgEl("path",{d:pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" "),fill:"none",stroke:css(color),"stroke-width":width,"stroke-dasharray":dash}));}
+function dot(svg,x,y,color,r=6){svg.append(svgEl("circle",{cx:x,cy:y,r,fill:css(color),stroke:css("--surface"),"stroke-width":2}));}
+function chipGroup(sel,cb){const cs=[...document.querySelectorAll(sel+" .chip")];cs.forEach(c=>c.addEventListener("click",()=>{cs.forEach(x=>x.setAttribute("aria-pressed",x===c));cb(c);}));return ()=>cs.find(c=>c.getAttribute("aria-pressed")==="true");}
+
+const pc=(x,d=1)=>fmt(x*100,d)+"%";
+const gbp=(x,d=2)=>(x<-0.0000001?"−£":"£")+fmt(Math.abs(x),d);
+const gm=(x,d=1)=>(x<-0.0000001?"−£":"£")+fmt(Math.abs(x),d)+"m";
+
+// ===== 1 quiz
+const QUIZ=[
+ {q:"Tamar Systems plc has a capital budget of £50m, a target capital structure of 35% debt and 65% equity, and net income of £45m. Under the residual model its payout ratio is:",o:["27.8%","38.9%","72.2%","35.0%"],a:0,e:"Equity needed = 0.65 × 50 = £32.5m. Distribution = 45 − 32.5 = £12.5m, equation (9.7). Payout = 12.5 ÷ 45 = 27.8%, equation (9.5) (slides 22 and 23)."},
+ {q:"Fenwick Retail plc pays dividends of 84p a share a year. Its shares trade at £24.00. Its dividend yield is:",o:["2.9%","3.5%","8.4%","0.35%"],a:1,e:"Dividend yield = 0.84 ÷ 24.00 = 3.5%, equation (9.2) (slide 8)."},
+ {q:"Corbett Media plc paid dividends of £300m and bought back £500m of shares. Its market capitalisation is £20bn. Its total payout yield is:",o:["1.5%","2.5%","4.0%","8.0%"],a:2,e:"Total payout yield = (300 + 500) ÷ 20,000 = 4.0%, equation (9.4). The dividend yield alone is 1.5% (slide 8)."},
+ {q:"Lindley Foods plc shares close at £8.40 the day before they go ex-dividend. The dividend is 25p. Ignoring taxes and other news, the price when the market opens on the ex-dividend date should be about:",o:["£8.40","£8.65","£8.15","£6.30"],a:2,e:"P(ex) ≈ P(cum) − DPS = 8.40 − 0.25 = £8.15, equation (9.10). Buyers from the ex-date no longer get the dividend (slides 29 and 30)."},
+ {q:"Garside Chemicals plc has equity worth £900m and 60m shares. It uses £90m of surplus cash to buy back shares at the current price. After the buyback the share price is:",o:["£15.00","£16.67","£13.50","£16.50"],a:0,e:"Price = 900 ÷ 60 = £15.00. It buys 90 ÷ 15 = 6m shares, equation (9.13). After: (900 − 90) ÷ 54 = £15.00. The price does not change (slides 32 to 34)."},
+ {q:"Brennan Games plc shares trade at £120. It announces a 5-for-1 split. If the split does not change the value of the equity, the price after the split is:",o:["£600","£24","£96","£120"],a:1,e:"P(after) = 120 × 1 ÷ 5 = £24, equation (9.14) (slide 36)."},
+ {q:"Hollis Instruments plc pays out 60% of its earnings and earns a 12% return on equity. Its sustainable growth rate is:",o:["7.2%","4.8%","12.0%","20.0%"],a:1,e:"g = (1 − 0.60) × 12% = 4.8%, equation (9.8) (slide 25)."},
+ {q:"Kirkby Utilities plc is expected to pay a dividend of £1.20 next year. Its shares trade at £30.00 and dividends grow at 5% a year. Its cost of equity is:",o:["4.0%","5.0%","9.0%","9.2%"],a:2,e:"k(s) = 1.20 ÷ 30.00 + 5% = 4% + 5% = 9.0%, equation (9.9) (slide 25)."},
+ {q:"A UK higher-rate taxpayer receives £2,500 of dividends in 2026/27 and has no other dividend income. Her dividend tax is:",o:["£893.75","£715.00","£600.00","£0"],a:1,e:"(2,500 − 500 allowance) × 35.75% = £715.00 (slides 16 and 17)."},
+ {q:"Ashdown Mining plc has a loyal base of income investors and a steady regular dividend. A one-off asset sale brings in £1bn it does not need. The approach most consistent with the lecture is:",o:["Raise the regular dividend permanently","Return it as a special dividend or a buyback","Keep the cash in case it is needed","Cut the regular dividend to signal caution"],a:1,e:"A permanent rise would signal earnings the firm does not expect to repeat. A special dividend or buyback returns one-off cash without changing the regular dividend signal (slides 19, 26 and 31)."}];
+function makeQuiz(DATA,boxSel,scoreSel,resetSel,pfx){let ans={};
+ function render(){const box=$(boxSel);box.replaceChildren();
+  DATA.forEach((it,qi)=>{const q=el("div",{class:"q"});q.append(el("p",{},(qi+1)+". "+it.q));const opts=el("div",{class:"opts",role:"radiogroup"});
+   it.o.forEach((o,oi)=>{const lab=el("label",{class:"opt"});const id=`${pfx}${qi}o${oi}`;const inp=el("input",{type:"radio",name:pfx+qi,id});lab.setAttribute("for",id);
+    if(ans[qi]!==undefined){inp.disabled=true;if(oi===it.a)lab.classList.add("right");if(oi===ans[qi]&&oi!==it.a)lab.classList.add("wrong");if(oi===ans[qi])inp.checked=true;}
+    inp.addEventListener("change",()=>{ans[qi]=oi;render();});lab.append(inp,el("span",{},o));opts.append(lab);});
+   q.append(opts);if(ans[qi]!==undefined){const ok=ans[qi]===it.a;const fb=el("div",{class:"fb "+(ok?"ok":"no")});
+    fb.innerHTML=((ok?"Correct. ":"Not quite. ")+it.e).replace(/P\((ex|cum|after)\)/g,"P<sub>$1</sub>").replace(/k\(s\)/g,"k<sub>s</sub>");q.append(fb);}
+   box.append(q);});
+  const score=Object.entries(ans).filter(([qi,v])=>DATA[qi].a===v).length;$(scoreSel).textContent=`Score: ${score} / ${DATA.length}`;}
+ $(resetSel).addEventListener("click",()=>{ans={};render();});return render;}
+
+// ===== 9a quiz (capital structure theory)
+const QUIZA=[
+ {q:"Under the trade-off theory, a firm's optimal capital structure is reached when:",o:["Debt is as high as lenders allow","The tax saving from one more pound of debt just equals the extra expected cost of financial distress","The firm has no debt at all","The debt ratio equals the industry average"],a:1,e:"At low leverage the tax benefit of extra debt outweighs the extra expected distress cost; at high leverage the reverse. The optimum balances the two at the margin, and there is a wide range of near-optimal structures (slides 5 and 6)."},
+ {q:"Which of these is an indirect cost of financial distress?",o:["Lawyers' fees in a bankruptcy","Administrators' fees","Customers avoiding products that come with long warranties","Interest paid on the firm's bonds"],a:2,e:"Legal and administrative fees are direct costs and are small. Indirect costs, such as lost customers, suppliers cutting credit and weaker job applicants, are much larger: about 10% to 20% of firm value in Andrade and Kaplan (1998) (slides 2 and 3)."},
+ {q:"Under signalling theory, managers who believe their shares are undervalued and need new funds will prefer to:",o:["Issue new shares","Issue debt","Pay a special dividend","Do nothing until the price falls further"],a:1,e:"Managers sell shares when they think the shares are overvalued and borrow when they think they are undervalued. Investors know this, so they read a share issue as a negative signal (slide 8)."},
+ {q:"According to the pecking order theory, a firm that needs funds turns to them in this order:",o:["New shares, then debt, then retained earnings","Debt, then retained earnings, then new shares","Retained earnings, then debt, then new shares","Retained earnings, then new shares, then debt"],a:2,e:"Internal funds have no flotation costs and send no signal; debt has lower flotation costs than equity and little negative signal; new shares come last (slide 10)."},
+ {q:"Which finding fits the pecking order better than the trade-off theory?",o:["Highly profitable firms tend to have low debt ratios","Firms with high tax rates borrow more","Firms with risky assets borrow less","Firms aim for a target debt ratio"],a:0,e:"Profitable firms can fund themselves from retained earnings, so the pecking order predicts low debt. The trade-off theory predicts the opposite, since profitable firms gain most from the tax shield (slides 5, 10 and 11)."},
+ {q:"Halsey Brands plc is mature, generates far more cash than it needs and has few new projects. According to agency theory, more debt could help shareholders because it:",o:["Raises the firm's tax rate","Commits managers to pay out cash, leaving less to spend on perks or poor acquisitions","Makes the shares less risky","Removes the need for a credit rating"],a:1,e:"Debt payments discipline managers by reducing the free cash flow they control (slide 12)."},
+ {q:"A highly indebted firm turns down a risky project with a positive NPV because it raises the chance of financial distress. This is:",o:["Market timing","The underinvestment problem","The clientele effect","Signalling"],a:1,e:"Debt raises the risk of financial distress, so managers may avoid risky projects even when they would add value (slide 13)."},
+ {q:"Which firm should keep the most spare borrowing capacity?",o:["A water utility with stable, regulated revenue","A biotech firm with volatile sales, specialised laboratories and many projects in development","A property company whose buildings make good collateral","A supermarket with steady sales"],a:1,e:"Volatile sales, high operating leverage, many investment opportunities and special-purpose assets all argue for keeping reserve borrowing capacity, as Pfizer used for Seagen in 2023 (slides 14, 15 and 21)."},
+ {q:"Kenley Engineering plc has EBITDA of £40m and net interest of £15m. Its net interest deduction is capped at 30% of EBITDA and the tax rate is 25%. How much tax does its interest save this year?",o:["£3.75m","£3.00m","£10.00m","£0.90m"],a:1,e:"Only 30% × £40m = £12m of the £15m interest can be deducted this year, so the tax saving is 25% × £12m = £3.0m, not 25% × £15m = £3.75m. The other £3m is not lost: it is carried forward and can be deducted in a later year, so the cap delays part of the tax benefit of debt. US firms affected by a similar cap borrowed less (Carrizosa, Gaertner and Lynch, 2023; slides 7 and 20)."}];
+const renderQuizA=makeQuiz(QUIZA,"#quizAbox","#quizAscore","#quizAReset","qa");
+const renderQuiz=makeQuiz(QUIZ,"#quizbox","#quizscore","#quizReset","q");
+
+// ===== 2 policy exercise (Keswick Instruments)
+const KW={dl:4.2,nl:14,g:0.08,ni:21,inv:12,w:0.70};
+function kwSolve(){const pol=KW.dl/KW.nl,a1=KW.dl*(1+KW.g),a2=pol*KW.ni,a3=KW.ni-KW.w*KW.inv,extra=Math.max(0,a3-a1);
+ return {pol,a1,a2,a3,extra,a4:a1+extra};}
+const KS={1:[["k1a","(1) Grow the dividend at 8% (£m)","a1",0.0051],["k1b","(2) Keep last year's payout ratio (£m)","a2",0.0051],["k1c","(3) Residual model (£m) (9.7)","a3",0.0051],["k1d","(4) Extra on top of the regular (1) (£m)","extra",0.0051]]};
+const K2=[["Which policy suits Keswick best this year?",["(1) Grow the dividend at 8%","(2) Keep the payout ratio","(3) Pure residual","(4) Regular dividend plus an extra"],3,"Policy (4): investors get a regular dividend they can rely on, growing at 8%, and the one-off windfall goes back as an extra that is clearly not repeated. (2) and (3) would push the regular dividend up to a level Keswick cannot keep next year, so it would have to cut it, a bad signal; (1) leaves £8.06m idle in the company."]];
+let k2Ans={};
+function buildKw(){Object.entries(KS).forEach(([st,arr])=>{const box=$("#k"+st);box.replaceChildren(...arr.map(([id,lab])=>{const f=el("div",{class:"field"});const i=el("input",{type:"number",id,step:"0.01"});i.addEventListener("input",()=>{i.style.borderColor="";$("#k"+st+"Msg").textContent="";});f.append(el("label",{for:id},lab),i);return f;}));});
+ kChips($("#k2"),K2,k2Ans,2);}
+function kChips(box,QS,store,st){box.replaceChildren();QS.forEach(([q,opts],qi)=>{const w=el("div",{style:"margin-bottom:10px"});w.append(el("p",{style:"margin:0 0 6px;font-weight:500"},q));const ch=el("div",{class:"chips"});
+  opts.forEach((o,oi)=>{const b=el("button",{class:"chip",type:"button","aria-pressed":store[qi]===oi},o);b.addEventListener("click",()=>{store[qi]=oi;ch.querySelectorAll(".chip").forEach((x,j)=>x.setAttribute("aria-pressed",j===oi));$("#k"+st+"Msg").textContent="";});ch.append(b);});w.append(ch);box.append(w);});}
+const KHINT={1:"Last year's payout ratio = 4.2 ÷ 14.0. The residual = net income − equity weight × investment. The extra = residual − regular dividend from (1).",
+ 2:"Think about what each policy does to the regular dividend next year, when earnings fall back to their normal path."};
+function kCheck(st,show){const S=kwSolve();let ok=0,tried=0;
+ (KS[st]||[]).forEach(([id,,key,tol])=>{const i=$("#"+id);if(show)i.value=(Math.round(S[key]*100)/100).toString();if(i.value==="")return;tried++;const g=Math.abs(parseFloat(i.value)-S[key])<=tol;i.style.borderColor=css(g?"--ok":"--bad");if(g)ok++;});
+ if(st==2){const QS=K2,store=k2Ans;if(show){QS.forEach((q,qi)=>{store[qi]=q[2];});kChips($("#k"+st),QS,store,st);}tried=Object.keys(store).length;ok=QS.filter((q,qi)=>store[qi]===q[2]).length;}
+ if(!show&&tried>0){const sb=document.querySelector(`[data-kshow="${st}"]`);if(sb)sb.hidden=false;}
+ let msg=tried===0?"Enter at least one answer first.":`${ok} of ${tried} right.`+(ok<tried?" Hint: "+KHINT[st]:"");
+ if(show){const sol={
+  1:`Last year's payout ratio = 4.2 ÷ 14.0 = 30%. (1) 4.2 × 1.08 = £${fmt(S.a1,3)}m. (2) 30% × 21.0 = £${fmt(S.a2,2)}m. (3) Equity needed 0.70 × 12.0 = £8.40m; residual 21.0 − 8.40 = £${fmt(S.a3,2)}m. (4) Regular £${fmt(S.a1,3)}m + extra £${fmt(S.extra,3)}m = £${fmt(S.a4,2)}m in total.`,
+  2:K2[0][3]}[st];msg="Solution: "+sol;}
+ $("#k"+st+"Msg").textContent=msg;}
+document.querySelectorAll("[data-kstep]").forEach(b=>b.addEventListener("click",()=>kCheck(+b.dataset.kstep,false)));
+document.querySelectorAll("[data-kshow]").forEach(b=>b.addEventListener("click",()=>kCheck(+b.dataset.kshow,true)));
+$("#kReset").addEventListener("click",()=>{k2Ans={};buildKw();[1,2].forEach(s=>$("#k"+s+"Msg").textContent="");document.querySelectorAll("[data-kshow]").forEach(b=>b.hidden=true);});
+
+// ===== 3 mini case (Ellison Healthcare)
+const EH={ni:1800,div:720,rep:400,n:1500,price:16,ocf:2900,inv:900,hist:[[630,0],[675,0],[720,400]],cash0:2100,cash1:3200};
+function eSolve(){const fcfe=EH.ocf-EH.inv,mc=EH.n*EH.price,dps=EH.div/EH.n;
+ return {po:EH.div/EH.ni*100,tpo:(EH.div+EH.rep)/EH.ni*100,fcfe,ret:(EH.div+EH.rep)/fcfe*100,cum:EH.hist.reduce((a,[d,r])=>a+d+r,0),dcash:EH.cash1-EH.cash0,
+  mc,dps,dy:dps/EH.price*100,by:EH.rep/mc*100,ty:(EH.div+EH.rep)/mc*100};}
+const CS={1:[["c1a","Payout ratio, 2025 (%) (9.5)","po",0.06],["c1b","Total payout ratio, 2025 (%) (9.6)","tpo",0.06],["c1c","FCFE before net borrowing, 2025 (£m)","fcfe",0.6],["c1d","Cash returned as % of FCFE, 2025","ret",0.06],["c1e","Total cash returned, 2023 to 2025 (£m)","cum",0.6],["c1f","Increase in cash, end-2023 to end-2025 (£m)","dcash",0.6]],
+ 2:[["c2a","Market capitalisation (£m)","mc",0.6],["c2b","Dividend per share (£)","dps",0.0051],["c2c","Dividend yield (%) (9.2)","dy",0.006],["c2d","Buyback yield (%) (9.3)","by",0.006],["c2e","Total payout yield (%) (9.4)","ty",0.006]]};
+const C3=[["Ellison's payout ratio against the US pharma sector (58.6%) is:",["Lower","About the same","Higher"],0,"40.0% is well below 58.6%."],
+ ["Its cash returned as a share of FCFE against the sector (73.7%) is:",["Lower","About the same","Higher"],0,"56.0% against 73.7%: Ellison keeps more of its free cash flow."],
+ ["Its dividend yield against the UK market (3.3%) is:",["Lower","About the same","Higher"],1,"3.00% is close to the UK market's 3.3% (and GSK's 3.54%)."],
+ ["Its total payout yield against GSK, the UK pharma peer (5.28%), is:",["Lower","About the same","Higher"],0,"4.67% against 5.28%: GSK returns more relative to its market value, through both dividends and buybacks."],
+ ["Over 2023 to 2025 Ellison's cash balance:",["Fell","Stayed flat","Rose"],2,"Cash rose by £1,100m to £3,200m even after returning £2,425m."]];
+const C4=[["Ellison's cash is building up and its debt is low. Assuming it has no better use for the cash, it should:",["Keep accumulating cash","Return more cash to shareholders","Issue new shares"],1,"Idle cash earns less than shareholders require and invites agency costs; with FCFE well above what is returned, it can return more."],
+ ["In what form should the extra cash go back?",["A large permanent rise in the regular dividend","Buybacks or a special dividend, keeping the progressive regular dividend","Stop the dividend and use only buybacks"],1,"A progressive dividend serves its income clientele; extra cash that may not recur goes back through buybacks or a special dividend, which can be cut without the signal of a dividend cut."],
+ ["Which point should the recommendation also address?",["The R&D pipeline and any acquisitions planned, which need cash","Last year's share price","The number of shareholders"],0,"Payout comes after investment: the residual model says fund good projects first, then return the rest."]];
+let c3Ans={},c4Ans={};
+function chipQs(box,QS,store,st){box.replaceChildren();QS.forEach(([q,opts],qi)=>{const w=el("div",{style:"margin-bottom:10px"});w.append(el("p",{style:"margin:0 0 6px;font-weight:500"},q));const ch=el("div",{class:"chips"});
+  opts.forEach((o,oi)=>{const b=el("button",{class:"chip",type:"button","aria-pressed":store[qi]===oi},o);b.addEventListener("click",()=>{store[qi]=oi;ch.querySelectorAll(".chip").forEach((x,j)=>x.setAttribute("aria-pressed",j===oi));$("#c"+st+"Msg").textContent="";});ch.append(b);});w.append(ch);box.append(w);});}
+function buildCase(){Object.entries(CS).forEach(([st,arr])=>{const box=$("#c"+st);box.replaceChildren(...arr.map(([id,lab])=>{const f=el("div",{class:"field"});const i=el("input",{type:"number",id,step:"0.01"});i.addEventListener("input",()=>{i.style.borderColor="";$("#c"+st+"Msg").textContent="";});f.append(el("label",{for:id},lab),i);return f;}));});
+ chipQs($("#c3"),C3,c3Ans,3);chipQs($("#c4"),C4,c4Ans,4);}
+const HINT={1:"Payout = dividends ÷ net income; total payout = (dividends + repurchases) ÷ net income. FCFE before net borrowing = operating cash flow − investment. Add up three years of dividends and repurchases.",
+ 2:"Market capitalisation = shares × price. DPS = dividends ÷ shares. Each yield divides by the share price or the market capitalisation.",
+ 3:"Compare each ratio with its benchmark, and look at what happened to the cash balance.",
+ 4:"Ask: does Ellison need the cash? Who are its shareholders? Which form of payout can be reversed without a bad signal?"};
+function checkStep(st,show){const S=eSolve();let ok=0,tried=0;
+ (CS[st]||[]).forEach(([id,,key,tol])=>{const i=$("#"+id);if(show)i.value=(Math.round(S[key]*100)/100).toString();if(i.value==="")return;tried++;const g=Math.abs(parseFloat(i.value)-S[key])<=tol;i.style.borderColor=css(g?"--ok":"--bad");if(g)ok++;});
+ if(st==3||st==4){const QS=st==3?C3:C4,store=st==3?c3Ans:c4Ans;if(show){QS.forEach((q,qi)=>{store[qi]=q[2];});chipQs($("#c"+st),QS,store,st);}tried=Object.keys(store).length;ok=QS.filter((q,qi)=>store[qi]===q[2]).length;}
+ if(!show&&tried>0){const sb=document.querySelector(`[data-show="${st}"]`);if(sb)sb.hidden=false;}
+ let msg=tried===0?"Enter at least one answer first.":`${ok} of ${tried} right.`+(ok<tried?" Hint: "+HINT[st]:"");
+ if(show){const sol={
+  1:`Payout = 720 ÷ 1,800 = ${fmt(S.po,1)}%. Total payout = (720 + 400) ÷ 1,800 = ${fmt(S.tpo,1)}%. FCFE = 2,900 − 900 = £${fmt(S.fcfe,0)}m; returned (720 + 400) ÷ 2,000 = ${fmt(S.ret,1)}%. Returned 2023 to 2025: 630 + 675 + 720 + 400 = £${fmt(S.cum,0)}m. Cash rose 3,200 − 2,100 = £${fmt(S.dcash,0)}m.`,
+  2:`Market capitalisation = 1,500 × £16.00 = £${fmt(S.mc,0)}m. DPS = 720 ÷ 1,500 = £${fmt(S.dps,2)}. Dividend yield = 0.48 ÷ 16.00 = ${fmt(S.dy,2)}%. Buyback yield = 400 ÷ 24,000 = ${fmt(S.by,2)}%. Total payout yield = 1,120 ÷ 24,000 = ${fmt(S.ty,2)}%.`,
+  3:C3.map(q=>q[3]).join(" "),4:C4.map(q=>q[3]).join(" ")}[st];msg="Solution: "+sol;}
+ $("#c"+st+"Msg").textContent=msg;}
+document.querySelectorAll("[data-step]").forEach(b=>b.addEventListener("click",()=>checkStep(+b.dataset.step,false)));
+document.querySelectorAll("[data-show]").forEach(b=>b.addEventListener("click",()=>checkStep(+b.dataset.show,true)));
+$("#cReset").addEventListener("click",()=>{c3Ans={};c4Ans={};buildCase();[1,2,3,4].forEach(s=>$("#c"+s+"Msg").textContent="");document.querySelectorAll("[data-show]").forEach(b=>b.hidden=true);});
+
+// ===== tabs and boot
+const tabs=[...document.querySelectorAll('nav.tabs button')];
+function showTab(id){tabs.forEach(b=>{const on=b.getAttribute("aria-controls")===id;b.setAttribute("aria-selected",on);document.getElementById(b.getAttribute("aria-controls")).hidden=!on;});try{localStorage.setItem("dr-tab",id);}catch(e){}}
+tabs.forEach(b=>b.addEventListener("click",()=>showTab(b.getAttribute("aria-controls"))));
+renderQuizA();renderQuiz();buildKw();buildCase();
+try{const t=localStorage.getItem("dr-tab");if(t&&document.getElementById(t))showTab(t);}catch(e){}
+
+</script>
+</body>
+</html>
