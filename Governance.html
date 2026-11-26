@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Governance and ESG Activities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky tab bar over a single 1100px column; each tab is a workbench of panels (controls left, readout right) */
+:root{
+  --bg:#F5F7F9; --surface:#FFFFFF; --ink:#16202C; --muted:#5B6B82; --line:#D9E0E8;
+  --navy:#0E1A2B; --teal:#0E8A96; --amber:#C98A22; --red:#C2453B; --slate:#5B6B82; --tint:#E8F3F4;
+  --ok:#1E7F4F; --bad:#B23A30;
+  --f-display:"Newsreader", Georgia, "Times New Roman", serif;
+  --f-body:"IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C141F; --surface:#131E2C; --ink:#E6ECF2; --muted:#9AA9BC; --line:#26354A;
+  --navy:#E6ECF2; --teal:#4FC3CC; --amber:#E8B04F; --red:#EE7A6E; --slate:#9AA9BC; --tint:#14303A;
+  --ok:#5FD39A; --bad:#F08A80; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C141F; --surface:#131E2C; --ink:#E6ECF2; --muted:#9AA9BC; --line:#26354A;
+  --navy:#E6ECF2; --teal:#4FC3CC; --amber:#E8B04F; --red:#EE7A6E; --slate:#9AA9BC; --tint:#14303A;
+  --ok:#5FD39A; --bad:#F08A80; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:14px}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0;text-wrap:balance}
+.kicker{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+.sub{color:var(--muted);margin:4px 0 0;max-width:62ch}
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;gap:4px;overflow-x:auto;border-bottom:1px solid var(--line);margin:0 -16px 20px;padding:8px 16px 0}
+nav.tabs button{font:inherit;font-weight:500;background:none;border:0;border-bottom:3px solid transparent;color:var(--muted);padding:8px 12px 10px;cursor:pointer;white-space:nowrap}
+nav.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--teal)}
+nav.tabs button:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.tabnum{font-family:var(--f-mono);font-size:12px;color:var(--teal);margin-right:6px}
+section.tab{display:grid;gap:18px}
+h2{font-family:var(--f-display);font-size:26px;font-weight:700;margin:0;text-wrap:balance}
+h3{font-size:16px;font-weight:600;margin:0 0 8px}
+.lede{color:var(--muted);margin:2px 0 0;max-width:70ch}
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:18px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:820px){.grid2,.grid3{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.panel.flat{background:var(--tint);border-color:transparent}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:4px}
+.field{display:grid;gap:4px;margin-bottom:12px}
+.row{display:flex;flex-wrap:wrap;gap:12px}
+.row>.field{flex:1 1 120px}
+input[type=number],input[type=text],select,textarea{font:inherit;font-family:var(--f-mono);font-size:14px;width:100%;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+textarea{font-family:var(--f-body);resize:vertical;min-height:60px}
+input[type=range]{width:100%;accent-color:var(--teal)}
+.rangeval{font-family:var(--f-mono);font-size:14px;color:var(--ink)}
+button.btn{font:inherit;font-weight:500;padding:8px 14px;border-radius:6px;border:1px solid var(--teal);background:var(--teal);color:var(--surface);cursor:pointer}
+button.btn.ghost{background:transparent;color:var(--teal)}
+button.btn.small{padding:4px 10px;font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--teal);border-color:var(--teal);color:var(--surface)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--tint);border-radius:8px;padding:10px 12px}
+.stat .v{font-family:var(--f-mono);font-size:22px;font-weight:500;font-variant-numeric:tabular-nums}
+.stat .k{font-size:12px;color:var(--muted)}
+.rating{display:inline-block;font-family:var(--f-mono);font-weight:500;padding:2px 8px;border-radius:4px;color:#fff}
+.rating.ig{background:#1E7F4F}.rating.bbb{background:#B07A12}.rating.hy{background:#B23A30}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em}
+.tablewrap{overflow-x:auto}
+.chart{width:100%;height:auto;display:block}
+.chart text{fill:var(--muted);font-family:var(--f-body);font-size:11px}
+.chart .grid{stroke:var(--line);stroke-width:1}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.note{font-size:13px;color:var(--muted)}
+.q{border-top:1px solid var(--line);padding-top:14px;margin-top:14px}
+.q:first-of-type{border-top:0;margin-top:0;padding-top:0}
+.q p{margin:0 0 8px;font-weight:500}
+.opts{display:grid;gap:6px}
+.opt{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:6px;cursor:pointer;background:var(--surface)}
+.opt input{margin-top:4px}
+.opt.right{border-color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,var(--surface))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
+.fb{font-size:14px;margin-top:6px}
+.fb.ok{color:var(--ok)}.fb.no{color:var(--bad)}
+.ans{display:grid;grid-template-columns:minmax(0,1fr) 120px auto;gap:8px;align-items:center;padding:8px 0;border-bottom:1px dashed var(--line)}
+.ans:last-child{border-bottom:0}
+.ans .mark{font-size:13px;min-width:70px}
+.mark.ok{color:var(--ok)}.mark.no{color:var(--bad)}
+.given{font-family:var(--f-mono);font-size:13px;background:var(--tint);border-radius:6px;padding:8px 10px;margin:6px 0 10px;line-height:1.7}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.role{border:1px solid var(--line);border-radius:8px;padding:12px;background:var(--surface)}
+.role h4{margin:0 0 6px;font-size:15px}
+.role p{margin:0 0 6px;font-size:13.5px}
+.role ul{margin:0;padding-left:18px;font-size:13.5px}
+.bar{height:26px;border-radius:4px;background:var(--teal);min-width:2px;transition:width .3s}
+.barrow{display:grid;grid-template-columns:150px minmax(0,1fr) 44px;gap:10px;align-items:center;margin-bottom:8px;font-size:14px}
+.barrow .n{font-family:var(--f-mono);text-align:right}
+.reasons{display:grid;gap:6px;max-height:260px;overflow:auto;margin-top:10px}
+.reasons div{font-size:13.5px;background:var(--tint);border-radius:6px;padding:6px 10px}
+.status{font-size:13px;color:var(--muted)}
+details summary{cursor:pointer;color:var(--teal);font-weight:500}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (max-width:520px){.ans{grid-template-columns:minmax(0,1fr) 100px}.ans .mark{grid-column:1/-1}.barrow{grid-template-columns:110px minmax(0,1fr) 36px}}
+
+</style>
+<style>
+.eq{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;margin:6px 0}
+.eq math{font-size:1.12em;color:var(--ink);overflow:visible}
+@media (max-width:560px){.eq math{font-size:.85em}}
+nav.tabs{scrollbar-width:none}nav.tabs::-webkit-scrollbar{display:none}
+.eqn{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.eqs{display:grid;gap:2px}
+#h1 .field,#h2 .field,#h3 .field,#v1 .field,#v2 .field{flex:1 1 220px}
+.cq{margin-bottom:10px}.eqh{margin:0 0 4px;font-weight:600;color:var(--ink)}.eqbox{margin-top:10px}.cqt{margin:0 0 6px;font-weight:500}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <p class="kicker">FIN7F2 Corporate Finance · Lecture 10</p>
+      <h1>Corporate Governance and ESG</h1>
+      <p class="sub">Two quizzes and a worked activity on Lecture 10. All companies here are fictional. Equation numbers are the same as in the Lecture 10 slides.</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Activities">
+    <button role="tab" id="t-qg" aria-controls="qg" aria-selected="true"><span class="tabnum">1</span>Governance quiz</button>
+    <button role="tab" id="t-hal" aria-controls="hal" aria-selected="false"><span class="tabnum">2</span>Votes and cash flows</button>
+    <button role="tab" id="t-qe" aria-controls="qe" aria-selected="false"><span class="tabnum">3</span>ESG quiz</button>
+  </nav>
+
+  <section class="tab" id="qg" role="tabpanel" aria-labelledby="t-qg">
+    <div><h2>Governance quiz</h2><p class="lede">Ten questions on Part I of Lecture 10: agency problems, governance models, boards, pay and voting rights. Each answer locks once chosen and shows the reasoning and the slide to revisit.</p></div>
+    <div class="panel"><div class="eqbox"><p class="eqh">Equations used in the quiz</p><div class="eqs"><div class="eq"><math display="block"><mrow><mtext>Voting power</mtext><mo>=</mo><mfrac><mrow><mtext>10</mtext><mo>×</mo><mtext>Class B shares held</mtext></mrow><mrow><mtext>Class A shares</mtext><mo>+</mo><mtext>10</mtext><mo>×</mo><mtext>Class B shares</mtext></mrow></mfrac></mrow></math><span class="eqn">(10.2)</span></div><div class="eq"><math display="block"><mrow><mtext>Wedge</mtext><mo>=</mo><mtext>Voting power</mtext><mo>−</mo><mtext>Cash‑flow rights</mtext></mrow></math><span class="eqn">(10.3)</span></div></div></div></div>
+    <div class="panel"><div id="qgbox"></div><p class="status" id="qgscore" style="margin-top:12px"></p><button class="btn ghost small" id="qgReset" type="button">Start again</button></div>
+  </section>
+
+  <section class="tab" id="hal" role="tabpanel" aria-labelledby="t-hal" hidden>
+    <div><h2>Votes and cash flows: Halden Robotics plc</h2><p class="lede">A founder, two share classes and a plan to raise capital (slides 24 to 27). Enter your answers and check each step; once you have checked a step, you can also see its solution. Give percentages to one decimal place.</p></div>
+    <div class="panel flat">
+      <h3>The facts (fictional)</h3>
+      <ul class="facts">
+        <li>Class A: <b>900m</b> shares, one vote each, listed. Class B: <b>120m</b> shares, ten votes each, unlisted. Both classes have the same rights to dividends.</li>
+        <li>The founder and CEO holds <b>110m</b> Class B shares and no Class A shares. Class B shares become Class A shares when sold.</li>
+        <li>Halden needs to raise capital for a factory and is choosing between <b>Plan A</b>: issue 300m new Class A shares, and <b>Plan C</b>: issue 300m new non-voting Class C shares at the same price.</li>
+      </ul>
+      <div class="eqbox"><p class="eqh">Equations for this activity</p><div class="eqs"><div class="eq"><math display="block"><mrow><mtext>Voting power</mtext><mo>=</mo><mfrac><mrow><mtext>10</mtext><mo>×</mo><mtext>Class B shares held</mtext></mrow><mrow><mtext>Class A shares</mtext><mo>+</mo><mtext>10</mtext><mo>×</mo><mtext>Class B shares</mtext></mrow></mfrac></mrow></math><span class="eqn">(10.2)</span></div><div class="eq"><math display="block"><mrow><mtext>Wedge</mtext><mo>=</mo><mtext>Voting power</mtext><mo>−</mo><mtext>Cash‑flow rights</mtext></mrow></math><span class="eqn">(10.3)</span></div></div></div>
+    </div>
+    <div class="panel"><h3>Step 1: the founder's position today</h3><div class="row" id="h1"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-hstep="1" type="button">Check step 1</button><button class="btn ghost small" data-hshow="1" type="button" hidden>Show the solution</button></div><p class="status" id="h1Msg"></p></div>
+    <div class="panel"><h3>Step 2: Plan A against Plan C</h3><div class="row" id="h2"></div><div id="h2q" style="margin-top:10px"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-hstep="2" type="button">Check step 2</button><button class="btn ghost small" data-hshow="2" type="button" hidden>Show the solution</button></div><p class="status" id="h2Msg"></p></div>
+    <div class="panel"><h3>Step 3: how much can the founder sell?</h3><div class="row" id="h3"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-hstep="3" type="button">Check step 3</button><button class="btn ghost small" data-hshow="3" type="button" hidden>Show the solution</button></div><p class="status" id="h3Msg"></p></div>
+    <div class="panel"><h3>Step 4: the minority investors' view</h3><div id="h4q"></div>
+      <div class="row" style="margin-top:8px"><button class="btn small" data-hstep="4" type="button">Check step 4</button><button class="btn ghost small" data-hshow="4" type="button" hidden>Show the solution</button><button class="btn ghost small" id="hReset" type="button">Start again</button></div><p class="status" id="h4Msg"></p></div>
+  </section>
+
+  <section class="tab" id="qe" role="tabpanel" aria-labelledby="t-qe" hidden>
+    <div><h2>ESG quiz</h2><p class="lede">Nine questions on Part II of Lecture 10: ESG themes, the evidence, what ratings measure, greenwashing, the US backlash and the rules. Each answer locks once chosen and shows the reasoning and the slide to revisit.</p></div>
+    <div class="panel"><div id="qebox"></div><p class="status" id="qescore" style="margin-top:12px"></p><button class="btn ghost small" id="qeReset" type="button">Start again</button></div>
+  </section>
+
+  <p class="note" style="margin-top:28px">All companies are fictional. Slide numbers refer to Lecture 10: Corporate Governance and ESG. Findings from papers, laws and regulators are as summarised on the slides named.</p>
+</div>
+<script>
+// ===== helpers =====
+const $=s=>document.querySelector(s);
+const fmt=(x,d=2)=>Number.isFinite(x)?x.toLocaleString("en-GB",{minimumFractionDigits:d,maximumFractionDigits:d}):"n/a";
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+function el(tag,attrs={},text){const e=document.createElement(tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(text!==undefined)e.textContent=text;return e;}
+function stats(box,items){box.replaceChildren(...items.map(([k,v])=>{const d=el("div",{class:"stat"});d.append(el("div",{class:"v"},v),el("div",{class:"k"},k));return d;}));}
+function table(tb,head,rows){tb.replaceChildren();const hr=el("tr");head.forEach(h=>hr.append(el("th",{},h)));tb.append(hr);rows.forEach(r=>{const tr=el("tr");r.forEach(c=>{const td=el("td");if(c instanceof Node)td.append(c);else td.textContent=c;tr.append(td);});tb.append(tr);});}
+const NS="http://www.w3.org/2000/svg";
+function svgEl(tag,attrs){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);return e;}
+function svgText(svg,x,y,t,anchor="middle",extra={}){const tx=svgEl("text",Object.assign({x,y,"text-anchor":anchor},extra));tx.textContent=t;svg.append(tx);return tx;}
+function niceStep(x){const p=Math.pow(10,Math.floor(Math.log10(x)));const n=x/p;return (n<1.5?1:n<3?2:n<7?5:10)*p;}
+function range(a,b,s){const out=[];for(let v=a;v<=b+1e-9;v+=s)out.push(+v.toFixed(10));return out;}
+function axes(svg,{xMin,xMax,yMin,yMax,xStep,yStep,xFmt,yFmt,xTitle,yTitle,m}){m=m||{l:52,r:14,t:12,b:38};const vb=svg.viewBox.baseVal,W=vb.width,H=vb.height;
+ const X=x=>m.l+(x-xMin)/(xMax-xMin)*(W-m.l-m.r),Y=y=>H-m.b-(y-yMin)/(yMax-yMin)*(H-m.t-m.b);svg.replaceChildren();
+ for(const t of range(Math.ceil(yMin/yStep)*yStep,yMax,yStep)){svg.append(svgEl("line",{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),class:"grid"}));svgText(svg,m.l-6,Y(t)+4,yFmt(t),"end");}
+ for(const t of range(Math.ceil(xMin/xStep)*xStep,xMax,xStep))svgText(svg,X(t),H-m.b+16,xFmt(t));
+ if(xTitle)svgText(svg,(m.l+W-m.r)/2,H-4,xTitle);if(yTitle)svgText(svg,12,(m.t+H-m.b)/2,yTitle,"middle",{transform:`rotate(-90 12 ${(m.t+H-m.b)/2})`});
+ svg.append(svgEl("line",{x1:m.l,x2:m.l,y1:m.t,y2:H-m.b,class:"grid"}));return {X,Y,W,H,m};}
+function path(svg,pts,color,width=2.5,dash=""){svg.append(svgEl("path",{d:pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" "),fill:"none",stroke:css(color),"stroke-width":width,"stroke-dasharray":dash}));}
+function dot(svg,x,y,color,r=6){svg.append(svgEl("circle",{cx:x,cy:y,r,fill:css(color),stroke:css("--surface"),"stroke-width":2}));}
+function chipGroup(sel,cb){const cs=[...document.querySelectorAll(sel+" .chip")];cs.forEach(c=>c.addEventListener("click",()=>{cs.forEach(x=>x.setAttribute("aria-pressed",x===c));cb(c);}));return ()=>cs.find(c=>c.getAttribute("aria-pressed")==="true");}
+
+const pc=(x,d=1)=>fmt(x*100,d)+"%";
+const sg=(x,d=1)=>(x<-1e-9?"−":"")+fmt(Math.abs(x),d);
+
+// ===== generic quiz (answers lock once chosen)
+function makeQuiz(DATA,boxSel,scoreSel,resetSel,pfx){let ans={};
+ function render(){const box=$(boxSel);box.replaceChildren();
+  DATA.forEach((it,qi)=>{const q=el("div",{class:"q"});q.append(el("p",{},(qi+1)+". "+it.q));const opts=el("div",{class:"opts",role:"radiogroup"});
+   it.o.forEach((o,oi)=>{const lab=el("label",{class:"opt"});const id=`${pfx}${qi}o${oi}`;const inp=el("input",{type:"radio",name:pfx+qi,id});lab.setAttribute("for",id);
+    if(ans[qi]!==undefined){inp.disabled=true;if(oi===it.a)lab.classList.add("right");if(oi===ans[qi]&&oi!==it.a)lab.classList.add("wrong");if(oi===ans[qi])inp.checked=true;}
+    inp.addEventListener("change",()=>{ans[qi]=oi;render();});lab.append(inp,el("span",{},o));opts.append(lab);});
+   q.append(opts);if(ans[qi]!==undefined){const ok=ans[qi]===it.a;q.append(el("div",{class:"fb "+(ok?"ok":"no")},(ok?"Correct. ":"Not quite. ")+it.e));}
+   box.append(q);});
+  const score=Object.entries(ans).filter(([qi,v])=>DATA[qi].a===v).length;$(scoreSel).textContent=`Score: ${score} / ${DATA.length}`;}
+ $(resetSel).addEventListener("click",()=>{ans={};render();});return render;}
+
+// ===== 1 governance quiz (Lecture 10, Part I)
+const QG=[
+ {q:"Ravensworth Foods plc is 55% owned by its founding family. The board approves a contract to buy packaging from a company the family also owns, at above-market prices. Which agency problem is this?",o:["Shareholders against managers","Controlling against minority shareholders","Shareholders against creditors","Managers against employees"],a:1,e:"The controller gains at the expense of the other shareholders, who cannot block the decision (slide 14)."},
+ {q:"Under UK company law, which shareholder vote on directors' pay is binding?",o:["The annual vote on the pay report","The vote on the pay policy, held at least every three years","Both votes","Neither: all UK pay votes are advisory"],a:1,e:"The policy vote is binding (Companies Act 2006, s. 439A); the annual vote on what was paid is advisory (s. 439) (slide 21)."},
+ {q:"A non-executive director of Ashby Telecom plc has sat on the board for eleven years. Under the UK Code this:",o:["Is banned outright","May impair independence, so the board must explain why it still treats the director as independent","Has no effect on independence","Requires a shareholder vote every month"],a:1,e:"Provision 10 lists service of more than nine years as a circumstance that may impair independence. The Code is comply or explain, so the board must justify its view (slides 12 and 18)."},
+ {q:"Larchfield AI plc has 800m Class A shares (one vote each) and 50m Class B shares (ten votes each), all held by the founder. Using equation (10.2), the founder's voting power is:",o:["5.9%","38.5%","50.0%","62.5%"],a:1,e:"Voting power = (10 × 50) ÷ (800 + 10 × 50) = 500 ÷ 1,300 = 38.5%, equation (10.2) (slide 24)."},
+ {q:"For the same founder, cash-flow rights are 50 ÷ 850 = 5.9%. The wedge, equation (10.3), is:",o:["32.6 percentage points","44.4 percentage points","6.5 times","5.9 percentage points"],a:0,e:"Wedge = 38.5% − 5.9% = 32.6 points, equation (10.3). The founder has about 6.5 times as many votes as cash-flow rights, but the wedge is a difference, not a ratio (slide 24)."},
+ {q:"Larchfield then pays a stock dividend of one non-voting Class C share for every Class A and Class B share. The founder's voting power:",o:["Falls by half","Stays at 38.5%","Rises","Falls to zero"],a:1,e:"Class C shares carry no votes, so votes are unchanged. Future issues of Class C shares can raise capital or pay staff without ever diluting control, as with Meta's Class C plan in 2026 (slide 25)."},
+ {q:"A study of about 1,000 US firms over 1978 to 2006 compared firms whose shareholders had weaker rights (more takeover defences and other restrictions) with the rest. The firms with weaker shareholder rights:",o:["Were valued more highly by the market","Were valued less by the market, relative to their assets","Showed no difference in value","Were all dual-class firms"],a:1,e:"Cremers and Ferrell (2014) find that restrictions on shareholder rights go with lower firm value. Bebchuk, Cohen and Wang (2013) add that the extra stock returns of well-governed firms in the 1990s disappeared in 2000 to 2008, once investors learned to price governance (slide 27)."},
+ {q:"An analyst's governance checklist ends by asking whether shareholders can do anything if management is doing a poor job. If they cannot, the analyst should:",o:["Value the firm as if it were run optimally","Value the firm as it is run","Ignore governance in the valuation","Use the industry average value"],a:1,e:"If management cannot be changed, the value of better management will not be realised, so value the firm as it is run, not as it could be run (slide 28)."},
+ {q:"Rheinwerk AG, a German manufacturer, has 12,000 employees. Under the Codetermination Act 1976, who elects half of its supervisory board?",o:["Its banks","Its employees","The German government","Its largest shareholder"],a:1,e:"In German firms with over 2,000 staff, employees elect half the supervisory board; shareholders elect the other half. This is the clearest example of the stakeholder model in Continental Europe (slide 11)."},
+ {q:"Under section 172 of the UK Companies Act 2006, directors must:",o:["Maximise this year's profit","Promote the success of the company for the benefit of its members, having regard to employees, suppliers, customers, the community and the environment","Treat employees and shareholders as equal owners","Follow the instructions of the largest shareholder"],a:1,e:"Section 172 keeps shareholders (members) as the beneficiaries but requires directors to consider other stakeholders and the long term: \"enlightened shareholder value\", between Friedman's shareholder primacy and the Business Roundtable's 2019 stakeholder pledge (slide 10)."}];
+
+// ===== 4 ESG quiz (Lecture 10, Part II)
+const QE=[
+ {q:"An equity fund excludes all tobacco and coal companies from its portfolio. This approach is:",o:["Positive screening","Negative screening","Engagement","Impact investing"],a:1,e:"Excluding whole sectors is negative screening; favouring ESG leaders is positive screening; engaging and voting works from inside the shareholder base (slide 31)."},
+ {q:"A government introduces a carbon tax that cuts the value of a cement producer's plants. For the producer this is:",o:["A physical risk","A transition risk","A governance risk","Not a climate risk"],a:1,e:"Transition risks come from policy, technology and preferences moving to a low-carbon economy; physical risks come from floods, heat and storms (slide 31)."},
+ {q:"Verdant Power plc pays a level cash flow to equity of £100m a year for ever. Its cost of equity is 8%. If investors who value its green profile accept 7% instead, the value of its equity rises by:",o:["1.0%","12.5%","14.3%","100%"],a:2,e:"Value = cash flow ÷ cost of equity: 100 ÷ 0.08 = £1,250m and 100 ÷ 0.07 = £1,428.6m, a rise of 14.3%. A lower expected return for green firms means a lower cost of capital, as in Pástor, Stambaugh and Taylor (2022) (slide 32)."},
+ {q:"When Morningstar began publishing sustainability ratings, Hartzmark and Sussman (2019) found that:",o:["Top-rated funds earned higher returns","Money flowed into top-rated funds and out of bottom-rated funds, but top-rated funds did not earn more","Investors ignored the ratings","Bottom-rated funds closed"],a:1,e:"Top-rated funds gained over $24bn of inflows and bottom-rated funds lost over $12bn, with no evidence that top-rated funds performed better (slide 32)."},
+ {q:"Flammer (2021) finds that when firms issue green bonds:",o:["Share prices fall","Share prices rise and environmental performance later improves","Nothing happens","Bond yields rise sharply"],a:1,e:"The positive market response and later improvement fit the view that green bonds are a credible signal of commitment (slide 32)."},
+ {q:"A UK asset manager markets a fund as \"sustainable\" while most of its holdings fail its own stated criteria. Since 31 May 2024 this breaches:",o:["The UK Corporate Governance Code","The FCA's anti-greenwashing rule, which requires sustainability claims to be fair, clear and not misleading","The Companies Act pay rules","Nothing: labels are voluntary"],a:1,e:"The FCA's anti-greenwashing rule applies to all authorised firms making sustainability claims. DWS was fined in the US and Germany for similar claims (slide 37)."},
+ {q:"A US state requires its Treasurer to list financial firms that \"boycott\" energy companies and bars state funds from investing with them. Which approach is this?",o:["Pecuniary-only fiduciary rule","Boycott list and divestment","Fair-access banking rule","Public contracting rule"],a:1,e:"This is the Texas SB 13 and Oklahoma model. Utah and Kansas use pecuniary-only fiduciary rules; Tennessee and Florida use fair-access rules for banks (slide 40)."},
+ {q:"Which statement about sustainability reporting rules in November 2026 is correct?",o:["The US SEC's climate disclosure rules are in force","The EU's Omnibus I cut the number of firms that must report under the CSRD","The UK has no sustainability reporting standards","All three jurisdictions now use the same rules"],a:1,e:"Omnibus I narrowed CSRD to firms with over 1,000 staff and €450m turnover. The UK issued UK SRS S1 and S2 in February 2026; the SEC stopped defending its rules in March 2025 (slide 43)."},
+ {q:"What do MSCI ESG Ratings aim to measure?",o:["The firm's total impact on the planet","Resilience to long-term, financially relevant ESG risks, relative to industry peers","Carbon emissions only","Whether the firm's share price will rise"],a:1,e:"MSCI rates financial materiality relative to industry peers, from AAA to CCC. Sustainalytics instead rates unmanaged ESG risk, and LSEG management quality and performance (slides 33 and 34)."}];
+
+const renderQG=makeQuiz(QG,"#qgbox","#qgscore","#qgReset","g");
+const renderQE=makeQuiz(QE,"#qebox","#qescore","#qeReset","e");
+
+// ===== generic stepped case: numeric fields + chip questions; solution button appears only after a Check with at least one answer
+function makeCase(P,cfg){const chipStore={};
+ function chips(st){const QS=cfg.chips[st];if(!QS)return;const box=$("#"+P+st+"q");box.replaceChildren();chipStore[st]=chipStore[st]||{};const store=chipStore[st];
+  QS.forEach(([q,opts],qi)=>{const w=el("div",{class:"cq"});w.append(el("p",{class:"cqt"},q));const ch=el("div",{class:"chips"});
+   opts.forEach((o,oi)=>{const b=el("button",{class:"chip",type:"button","aria-pressed":store[qi]===oi},o);b.addEventListener("click",()=>{store[qi]=oi;ch.querySelectorAll(".chip").forEach((x,j)=>x.setAttribute("aria-pressed",j===oi));$("#"+P+st+"Msg").textContent="";});ch.append(b);});
+   w.append(ch);box.append(w);});}
+ function build(){Object.entries(cfg.fields).forEach(([st,arr])=>{const box=$("#"+P+st);box.replaceChildren(...arr.map(([id,lab])=>{const f=el("div",{class:"field"});const i=el("input",{type:"number",id,step:"0.01",inputmode:"decimal"});i.addEventListener("input",()=>{i.style.borderColor="";$("#"+P+st+"Msg").textContent="";});f.append(el("label",{for:id},lab),i);return f;}));});
+  Object.keys(cfg.chips).forEach(st=>chips(st));}
+ function check(st,show){const S=cfg.solve();let ok=0,tried=0;
+  (cfg.fields[st]||[]).forEach(([id,,key,tol,dp])=>{const i=$("#"+id);if(show)i.value=S[key].toFixed(dp);if(i.value==="")return;tried++;const g=Math.abs(parseFloat(i.value)-S[key])<=tol;i.style.borderColor=css(g?"--ok":"--bad");if(g)ok++;});
+  const QS=cfg.chips[st];if(QS){const store=chipStore[st];if(show){QS.forEach((q,qi)=>{store[qi]=q[2];});chips(st);}tried+=Object.keys(store).length;ok+=QS.filter((q,qi)=>store[qi]===q[2]).length;}
+  if(!show&&tried>0){const sb=document.querySelector(`[data-${P}show="${st}"]`);if(sb)sb.hidden=false;}
+  let msg=tried===0?"Enter at least one answer first.":`${ok} of ${tried} right.`+(ok<tried?" Hint: "+cfg.hints[st]:"");
+  if(show)msg="Solution: "+cfg.solutions(S)[st];
+  $("#"+P+st+"Msg").textContent=msg;}
+ document.querySelectorAll(`[data-${P}step]`).forEach(b=>b.addEventListener("click",()=>check(+b.dataset[P+"step"],false)));
+ document.querySelectorAll(`[data-${P}show]`).forEach(b=>b.addEventListener("click",()=>check(+b.dataset[P+"show"],true)));
+ $("#"+P+"Reset").addEventListener("click",()=>{Object.keys(chipStore).forEach(k=>delete chipStore[k]);build();Object.keys(cfg.hints).forEach(s=>$("#"+P+s+"Msg").textContent="");document.querySelectorAll(`[data-${P}show]`).forEach(b=>b.hidden=true);});
+ return build;}
+
+// ===== 2 votes and cash flows: Halden Robotics plc
+const HR={A:900,B:120,F:110,newSh:300};
+const buildH=makeCase("h",{
+ solve(){const {A,B,F,newSh}=HR;const cf=F/(A+B)*100,vp=10*F/(A+10*B)*100;
+  const vpA=10*F/(A+newSh+10*B)*100,cfN=F/(A+B+newSh)*100;
+  const x=(10*F-0.5*(A+10*B))/(10-4.5);
+  return {cf,vp,wedge:vp-cf,vpA,cfN,vpC:vp,wedgeC:vp-cfN,x};},
+ fields:{1:[["h1a","Founder's cash-flow rights (%)","cf",0.06,1],["h1b","Founder's voting power (%) (10.2)","vp",0.06,1],["h1c","Wedge (percentage points) (10.3)","wedge",0.11,1]],
+  2:[["h2a","Plan A: voting power after issuing 300m Class A shares (%)","vpA",0.06,1],["h2b","Cash-flow rights after either plan (%)","cfN",0.06,1],["h2c","Plan C: voting power after issuing 300m Class C shares (%)","vpC",0.06,1],["h2d","Plan C: new wedge (percentage points)","wedgeC",0.11,1]],
+  3:[["h3a","Class B shares the founder can sell before voting power falls to 50% (m)","x",0.06,2]]},
+ chips:{2:[["Which plan keeps the founder in control?",["Plan A (Class A shares)","Plan C (non-voting Class C shares)","Neither"],1,"Only Plan C: Plan A takes the founder below 50% of the votes."]],
+  4:[["Halden's minority investors are asked to approve Plan C. What do they give up?",["Nothing: their votes and cash flows are unchanged","Future dilution of their cash flows can never come with a change of control","They lose their dividends"],1,"Plan C lets Halden raise capital again and again without ever threatening the founder's control, so a takeover premium becomes very unlikely."],
+   ["Which evidence from the lecture is most relevant to their decision?",["Dual-class premiums at IPO fade as the wedge widens (Cremers, Lauterbach and Pajuste, 2024)","Green bonds signal commitment (Flammer, 2021)","ESG ratings disagree (Berg et al., 2022)"],0,"Plan C widens the wedge from 41.6 to 44.0 points, the situation in which the evidence finds that dual-class valuations fall."]]},
+ hints:{1:"Cash-flow rights = founder's shares ÷ all shares. Voting power, equation (10.2) = 10 × founder's Class B ÷ (Class A + 10 × all Class B).",
+  2:"Plan A adds 300m to the Class A count, so it adds 300m votes. Plan C adds 300m shares but no votes.",
+  3:"If the founder sells x Class B shares they become Class A. The founder's votes are 10(110 − x); total votes are 900 + x + 10(120 − x). Set the first equal to half of the second and solve for x.",
+  4:"Think about what happens to the chance of a takeover bid, and to the wedge."},
+ solutions:S=>({1:`Cash-flow rights = 110 ÷ (900 + 120) = ${fmt(S.cf,1)}%. Voting power = (10 × 110) ÷ (900 + 10 × 120) = 1,100 ÷ 2,100 = ${fmt(S.vp,1)}%. Wedge = ${fmt(S.vp,1)} − ${fmt(S.cf,1)} = ${fmt(S.wedge,1)} points.`,
+  2:`Plan A: 1,100 ÷ (1,200 + 1,200) = ${fmt(S.vpA,1)}%, below a majority. Cash-flow rights under either plan: 110 ÷ 1,320 = ${fmt(S.cfN,1)}%. Plan C: votes unchanged at ${fmt(S.vpC,1)}%; wedge = ${fmt(S.vpC,1)} − ${fmt(S.cfN,1)} = ${fmt(S.wedgeC,1)} points. Only Plan C keeps the founder in control.`,
+  3:`10(110 − x) = 0.5 × (2,100 − 9x), so 1,100 − 10x = 1,050 − 4.5x, so 5.5x = 50 and x = ${fmt(S.x,2)}m. The founder can sell about 9m of 110m Class B shares, about 8% of the holding, and still control Halden.`,
+  4:"Plan C keeps Halden's capital-raising separate from control: minority holders give up any realistic chance of a takeover premium, and the wider wedge is the situation in which the evidence finds dual-class valuations fall (Cremers, Lauterbach and Pajuste, 2024)."})});
+
+// ===== tabs and boot
+const tabs=[...document.querySelectorAll('nav.tabs button')];
+function showTab(id){tabs.forEach(b=>{const on=b.getAttribute("aria-controls")===id;b.setAttribute("aria-selected",on);document.getElementById(b.getAttribute("aria-controls")).hidden=!on;});try{localStorage.setItem("cg-tab",id);}catch(e){}}
+tabs.forEach(b=>b.addEventListener("click",()=>showTab(b.getAttribute("aria-controls"))));
+renderQG();renderQE();buildH();
+try{const t=localStorage.getItem("cg-tab");if(t&&document.getElementById(t))showTab(t);}catch(e){}
+
+</script>
+</body>
+</html>
